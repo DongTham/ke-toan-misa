@@ -1,0 +1,131 @@
+@font-face {
+    font-family: Roboto-Bold;
+    src: url(../assets/fonts/notosans-bold.3ede5aff.woff2);
+}
+
+@font-face {
+    font-family: Roboto-Medium;
+    src: url(../assets/fonts/notosans-semibold.df3e6dc4.woff2);
+}
+
+@font-face {
+    font-family: Roboto-Regular;
+    src: url(../assets/fonts/notosans-regular.2cb88a13.woff2);
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    background-color: #F7F7F7;
+    outline: none;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: calc(100% - 200px);
+    flex: 1;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 0 0 0 24px;
+    font: 500 14px Roboto-Medium;
+    height: calc(100vh - 56px);
+}
+
+.main .main-header {
+    padding: 24px 0;
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: calc(100% - 58px);
+    background-color: #F7F7F7;
+}
+
+.main__header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.main .main-body {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    padding: 84px 24px 0 0;
+    overflow: auto;
+}
+
+.main__header-title {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: Roboto-Bold;
+    line-height: 26px;
+}
+
+.main__header-add .btn-add {
+    color: #FFFFFF;
+}
+
+.input-main {
+    height: 36px;
+    width: 100%;
+    padding: 0 8px 0 12px;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.input-main::placeholder {
+    color: #9E9E9E;
+}
+
+.input-main:hover,
+.input-main:hover~.btn-search {
+    background-color: #F6F6F6;
+}
+
+.input-main:focus {
+    border: 1px solid #50B83C;
+    background-color: #FFFFFF;
+}
+
+.input-main:focus~.btn-search {
+    background-color: #FFFFFF;
+}
+
+.main .main__icon {
+    background-color: unset;
+    height: 24px;
+    width: 24px;
+    margin: 0 6px;
+}
+
+.main__body-footer {
+    display: flex;
+    justify-content: space-between;
+    font: 400 14px Roboto-Regular;
+    padding: 16px;
+}
+
+.body__footer-right {
+    display: flex;
+}
+
+.btn-seclectdown {
+    background-position: -564px -365px;
+}
+
+.align-center {
+    justify-content: center;
+    align-items: center;
+}

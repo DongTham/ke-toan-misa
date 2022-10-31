@@ -1,0 +1,159 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #FFFFFF;
+    font: 500 14px Roboto-Medium;
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    height: 56px;
+}
+
+.header .header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header .header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header__icon {
+    background-color: unset;
+    height: 24px;
+    width: 24px;
+}
+
+.header__actions .header__icon {
+    margin: 0 10px;
+}
+
+.header .btn-toggle {
+    background-position: -843px -30px;
+    margin-right: 16px;
+}
+
+.header .header__branch {
+    display: flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    width: 100%;
+    padding: 0;
+}
+
+.header .btn-down {
+    background-position: -1122px -357px;
+}
+
+.header__branch,
+.profile {
+    font: 500 14px Roboto-Medium;
+    height: 32px;
+}
+
+.header-right .header__actions {
+    position: relative;
+    border: unset;
+    background-color: #FFFFFF;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    height: 56px;
+    padding: 0;
+}
+
+.header-right .header__actions:hover,
+.header-right .header__actions:focus {
+    background-color: #000;
+}
+
+.header-right .header__actions:hover.header__actions::after,
+.header-right .header__actions:focus.header__actions::after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-bottom: 8px solid transparent;
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-top: 8px solid #000;
+    position: absolute;
+    top: 56px;
+    right: 0;
+}
+
+.header-right>:first-child:hover,
+.header-right>:first-child:focus {
+    background-color: #2fa026;
+}
+
+.header-right>:first-child:hover.header__actions::after,
+.header-right>:first-child:focus.header__actions::after {
+    border-top: 8px solid #2fa026;
+}
+
+.header-right .btn-features {
+    background-position: -568px -30px;
+}
+
+.header__actions:hover .btn-features,
+.header__actions:focus .btn-features {
+    background-position: -568px -76px;
+}
+
+.header-right .btn-setting {
+    background-position: -676px -30px;
+}
+
+.header__actions:hover .btn-setting,
+.header__actions:focus .btn-setting {
+    background-position: -145px -88px;
+}
+
+.header-right .btn-chat {
+    background-position: -899px -30px;
+}
+
+.header__actions:hover .btn-chat,
+.header__actions:focus .btn-chat {
+    background-position: -368px -88px;
+}
+
+.header-right .btn-help {
+    background-position: -732px -30px;
+}
+
+.header__actions:hover .btn-help,
+.header__actions:focus .btn-help {
+    background-position: -201px -88px;
+}
+
+.header-right .btn-notify {
+    background-position: -788px -30px;
+}
+
+.header__actions:hover .btn-notify,
+.header__actions:focus .btn-notify {
+    background-position: -257px -88px;
+}
+
+.header-right .profile__icon {
+    background-position: -1070px -28px;
+    margin-left: 8px;
+}
+
+.header-right .profile {
+    display: flex;
+    align-items: center;
+    background-color: unset;
+}
+
+.header-right .profile img {
+    background-color: unset;
+    border-radius: 50%;
+    border: 1px solid #000;
+    margin-right: 6px;
+    box-sizing: border-box;
+}

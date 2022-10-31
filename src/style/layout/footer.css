@@ -1,0 +1,16 @@
+.main__body-footer {
+    position: sticky;
+    left: 0;
+    bottom: 0;
+    background-color: #FFFFFF;
+    z-index: 10;
+}
+
+.main__body-footer .combobox {
+    min-width: 200px;
+}
+
+.body__footer-right .btn {
+    border: unset;
+    background-color: transparent;
+}

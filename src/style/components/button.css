@@ -1,0 +1,39 @@
+.btn {
+    min-width: 80px;
+    height: 36px;
+    padding: 0 16px;
+    border: unset;
+    border-radius: 4px;
+    background-color: #50B83C;
+    font: 500 14px Roboto-Medium;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.btn:hover {
+    background-color: #73C663;
+}
+
+.btn:focus {
+    background-color: #409330;
+}
+
+.btn-icon {
+    border: unset;
+    background-color: #FFFFFF;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    background-image: url(../../assets/img/Sprites.64af8f61.svg);
+    background-repeat: no-repeat;
+    height: 20px;
+    width: 20px;
+    padding: 2px;
+}
+
+.button-text {
+    position: relative;
+    white-space: nowrap;
+}

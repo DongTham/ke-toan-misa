@@ -1,0 +1,195 @@
+.sidebar {
+    min-height: 100vh;
+    width: 200px;
+    background-color: #004137;
+    white-space: nowrap;
+}
+
+.sidebar .sidebar-logo {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background-color: #004137;
+}
+
+.sidebar-logo img {
+    height: 36px;
+}
+
+.sidebar__logo-option {
+    background-position: -424px -88px;
+    background-color: #004137;
+    margin-right: 16px;
+}
+
+.sidebar-menu {
+    padding: 20px 12px;
+    height: calc(100vh - 96px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+/* .minimize {
+    width: 56px;
+}
+
+.minimize .menu-button {
+    width: auto;
+} */
+
+.menu-button {
+    position: relative;
+    font: 500 14px Roboto-Medium;
+    border: unset;
+    height: 44px;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background-color: #004137;
+    color: #DBDEE3;
+    display: flex;
+    align-items: center;
+    padding: 0 0 0 12px;
+}
+
+.menu__button-icon {
+    background-color: unset;
+    margin-right: 12px;
+    height: 24px;
+    width: 24px;
+}
+
+.menu-button:hover {
+    background-color: #01836F;
+}
+
+.menu-button:focus {
+    background-color: #34B6A2;
+    color: #FFFFFF;
+}
+
+.sidebar__menu-item .overview-icon {
+    background-position: -30px -1628px;
+}
+
+.menu-button:focus>.overview-icon {
+    background-position: -30px -1585px;
+}
+
+.sidebar__menu-item .cash-icon {
+    background-position: -73px -1628px;
+}
+
+.menu-button:focus>.cash-icon {
+    background-position: -73px -1585px;
+}
+
+.sidebar__menu-item .deposits-icon {
+    background-position: -117px -1629px;
+}
+
+.menu-button:focus>.deposits-icon {
+    background-position: -117px -1586px;
+}
+
+.sidebar__menu-item .purchase-icon {
+    background-position: -161px -1629px;
+}
+
+.menu-button:focus>.purchase-icon {
+    background-position: -161px -1586px;
+}
+
+.sidebar__menu-item .sell-icon {
+    background-position: -205px -1629px;
+}
+
+.menu-button:focus>.sell-icon {
+    background-position: -205px -1586px;
+}
+
+.sidebar__menu-item .invoice-icon {
+    background-position: -249px -1629px;
+}
+
+.menu-button:focus>.invoice-icon {
+    background-position: -249px -1586px;
+}
+
+.sidebar__menu-item .warehouse-icon {
+    background-position: -291px -1629px;
+}
+
+.menu-button:focus>.warehouse-icon {
+    background-position: -291px -1586px;
+}
+
+.sidebar__menu-item .tools-icon {
+    background-position: -336px -1629px;
+}
+
+.menu-button:focus>.tools-icon {
+    background-position: -336px -1586px;
+}
+
+.sidebar__menu-item .asset-icon {
+    background-position: -379px -1629px;
+}
+
+.menu-button:focus>.asset-icon {
+    background-position: -379px -1586px;
+}
+
+.sidebar__menu-item .tax-icon {
+    background-position: -423px -1630px;
+}
+
+.menu-button:focus>.tax-icon {
+    background-position: -423px -1587px;
+}
+
+.sidebar__menu-item .price-icon {
+    background-position: -468px -1630px;
+}
+
+.menu-button:focus>.price-icon {
+    background-position: -468px -1587px;
+}
+
+.sidebar__menu-item .synthetic-icon {
+    background-position: -510px -1629px;
+}
+
+.menu-button:focus>.synthetic-icon {
+    background-position: -510px -1586px;
+}
+
+.sidebar__menu-item .budget-icon {
+    background-position: -378px -1660px;
+}
+
+.menu-button:focus>.budget-icon {
+    background-position: -423px -1660px;
+}
+
+.sidebar__menu-item .report-icon {
+    background-position: -547px -1630px;
+}
+
+.menu-button:focus>.report-icon {
+    background-position: -547px -1587px;
+}
+
+.sidebar__menu-item .finance-icon {
+    background-position: -205px -1661px;
+}
+
+.menu-button:focus>.finance-icon {
+    background-position: -249px -1661px;
+}

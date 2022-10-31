@@ -1,0 +1,84 @@
+.main__body-function {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    margin: 20px 0 0 0;
+    background-color: #FFFFFF;
+    position: sticky;
+    left: 0;
+}
+
+.main__body-function .function-left {
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
+.main__body-function .function-right {
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
+.main__body-function .function__search {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 260px;
+    margin-right: 6px;
+}
+
+.main__body-function .btn-reload {
+    background-position: -423px -200px;
+}
+
+.main__body-function .btn-reload:hover {
+    background-position: -1095px -88px;
+}
+
+.main__body-function .btn-export {
+    background-position: -705px -200px;
+}
+
+.main__body-function .btn-export:hover {
+    background-position: -1265px -88px;
+}
+
+.main__body-function .btn-filter {
+    background-position: -88px -200px;
+}
+
+.main__body-function .btn-filter:hover {
+    background-position: -88px -256px;
+}
+
+.main__body-function .btn-search {
+    position: absolute;
+    right: 12px;
+    background-position: -425px -33px;
+}
+
+.function-left .batch-operation {
+    background-color: transparent;
+    border: 2px solid #3b3c3f;
+    border-radius: 30px;
+    padding: 0 12px 0 16px;
+}
+
+.function-left .batch-operation:hover,
+.function-left .batch-operation:focus {
+    background-color: #d3d3d7;
+}
+
+.function-left .button-text {
+    display: flex;
+}
+
+.function-left .btn-batch-operation {
+    background-color: transparent;
+    right: 0;
+    background-position: -558px -357px;
+    opacity: .5;
+    margin-left: 4px;
+}
