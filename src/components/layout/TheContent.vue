@@ -100,13 +100,15 @@
                                 </div>
                             </div>
 
-                            <button class="btn btn-prev" v-if="pageNumber == 1 ? disableButtonPrev : !disableButtonPrev" v-bind:disable="disableButtonPrev">Trước</button>
+                            <button class="btn btn-prev" v-if="pageNumber == 1 ? disableButtonPrev : !disableButtonPrev" v-bind:disabled="disableButtonPrev">Trước</button>
                             <div class="btn btn-pagination"></div>
-                            <button class="btn btn-next">Sau</button>
+                            <button class="btn btn-next" v-if="pageNumber == totalPages ? disableButtonPrev : !disableButtonPrev" v-bind:disabled="disableButtonPrev">Sau</button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            div 
 </template>
   
 <script>
@@ -166,7 +168,8 @@ export default {
             pageNumber: 1,
             numberRecords: 0,
             totalPages: 0,
-            selectPageSize: selectPageSize
+            selectPageSize: selectPageSize,
+            disableButtonPrev: true
         }
     }
 }
