@@ -14,3 +14,31 @@
     border: unset;
     background-color: transparent;
 }
+
+.body__footer-right .pagination {
+    display: flex;
+    align-items: center;
+    height: 36px;
+}
+
+.pagination .btn-pagination {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    outline: none;
+    border-radius: 4px;
+}
+
+.pagination .btn-pagination:hover {
+    background-color: #E0E0E0;
+}
+
+.pagination .active-item,
+.pagination .active-item:hover {
+    color: #FFFFFF;
+    font-weight: 700;
+    background-color: #50B83C;
+}

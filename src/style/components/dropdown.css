@@ -14,23 +14,23 @@
     cursor: pointer;
 }
 
-.combobox__button:hover {
-    background-color: #F7F7F7;
-}
-
 .combobox__button {
     width: 36px;
-    height: 36px;
+    height: 35px;
     background-image: url(../../assets/img/Sprites.64af8f61.svg);
     background-repeat: no-repeat;
     background-position: -934px -351px;
     position: absolute;
     right: 1px;
-    top: 1px;
     border: unset;
     border-radius: 0 3px 3px 0;
     background-color: transparent;
     cursor: pointer;
+    outline: none;
+}
+
+.combobox__button:hover {
+    background-color: #F7F7F7;
 }
 
 .combobox__data {
@@ -54,6 +54,7 @@
     cursor: pointer;
 }
 
+.combobox__data .active-item,
 .combobox__data .data-item:hover {
     background-color: #DCF1D8;
     border-radius: 4px;

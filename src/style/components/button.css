@@ -5,7 +5,9 @@
     border: unset;
     border-radius: 4px;
     background-color: #50B83C;
-    font: 500 14px Roboto-Medium;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: Roboto-Medium;
     outline: none;
     cursor: pointer;
     box-sizing: border-box;
