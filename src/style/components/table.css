@@ -5,29 +5,40 @@
 }
 
 table {
-    position: relative;
-    border-collapse: separate;
-    border-spacing: 0;
     font: 700 14px Roboto-Bold;
     z-index: 2;
     min-width: calc(100% + 24px);
+    border-spacing: 0;
+    box-sizing: border-box;
+}
+
+table tr {
+    outline: none;
+    position: relative;
 }
 
 table th,
 table td {
     white-space: nowrap;
-    border-bottom: 1px solid #E0E0E0;
-    border-right: 0;
     height: 48px;
+    max-height: 48px;
     padding: 0 16px;
-    outline: none;
-    box-sizing: border-box;
-    z-index: 1;
 }
 
-table td {
+table thead th {
+    position: sticky;
+    text-align: left;
+    top: -85px;
+    z-index: 5;
+    background-color: #EEEEEE;
+    border-top: 1px solid #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+table tbody td {
     background-color: #FFFFFF;
-    border-right: 1px dotted #E0E0E0;
+    border-bottom: 1px solid #E0E0E0;
+    font: 400 14px Roboto-Regular;
 }
 
 tr:first-child th:nth-child(2) {
@@ -46,40 +57,51 @@ tr:last-child td:nth-last-child(3) {
     border-bottom-right-radius: 4px;
 }
 
-tr:first-child td {
-    border-top: 1px solid #E0E0E0;
+tr th.ms-hidden,
+tr td.ms-hidden {
+    position: sticky;
+    border: unset;
+    padding: 0;
+    cursor: auto;
 }
 
 tr td:first-child,
-tr th:first-child {
-    position: sticky;
+tr th:first-child,
+tr td:nth-last-child(2),
+tr th:nth-last-child(2) {
     left: 0;
+    right: 0;
     z-index: 10;
     min-width: 16px;
     max-width: 16px;
     width: 16px;
-    padding: 0;
     background-color: #FFFFFF;
-    border: unset;
 }
 
-tr td:last-child,
-tr th:last-child {
-    position: sticky;
+tr th:last-child,
+tr td:last-child {
     right: -24px;
     z-index: 5;
     min-width: 24px;
     max-width: 24px;
     width: 24px;
-    padding: 0;
     background-color: #F7F7F7;
-    border: unset;
 }
 
-tr td:nth-child(2),
-tr th:nth-child(2) {
+tr th.ms-sticky,
+tr td.ms-sticky {
     position: sticky;
     left: 16px;
+    right: 16px;
+}
+
+tr th:nth-last-child(3),
+tr td:nth-last-child(3) {
+    border-right: 1px solid #E0E0E0;
+}
+
+tr th:nth-child(2),
+tr td:nth-child(2) {
     border-left: 1px solid #E0E0E0;
 }
 
@@ -87,70 +109,17 @@ tr th:nth-child(2) {
     z-index: 10;
 }
 
-tr td:nth-last-child(2),
-tr th:nth-last-child(2) {
-    position: sticky;
-    right: 0;
-    z-index: 5;
-    min-width: 16px;
-    max-width: 16px;
-    width: 16px;
-    padding: 0;
-    background-color: #FFFFFF;
-    border: unset;
-}
-
-tr td:nth-last-child(3),
-tr th:nth-last-child(3) {
-    position: sticky;
-    right: 16px;
-    border-left: 1px dotted #E0E0E0;
-    border-right: 1px solid #E0E0E0;
-}
-
-tr th {
-    position: sticky;
-    text-align: left;
-    top: -84px;
-    z-index: 5;
-    border-top: 1px solid #E0E0E0;
-    border-right: 1px solid #E0E0E0;
-    background-color: #EEEEEE;
-    box-sizing: border-box;
-}
-
-tr th:first-child,
-tr th:nth-last-child(2) {
-    cursor: none;
-    border: unset;
-    background-color: #FFFFFF;
-}
-
-tr th:last-child {
-    cursor: auto;
-    border: unset;
-    background-color: #F7F7F7;
-}
-
-table th:hover {
+tr:hover>th.ms-th-viewer {
     cursor: pointer;
 }
 
-table tbody tr {
-    font: 400 14px Roboto-Regular;
-}
-
-table tbody tr:hover>td {
+tr:hover>td.ms-td-viewer {
     background-color: #E6F6F3;
 }
 
-tr:hover>td:first-child,
-tr:hover>td:nth-last-child(2) {
-    background-color: #FFFFFF;
-}
-
-tr:hover>td:last-child {
-    background-color: #F7F7F7;
+tr:focus>td.ms-td-viewer,
+tr:has(input:checked)>td.ms-td-viewer {
+    background-color: #CCECE7;
 }
 
 th input,
@@ -158,13 +127,13 @@ td input {
     height: 20px;
     width: 20px;
     cursor: pointer;
+    outline: none;
 }
 
 .td-context-menu {
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
 }
 
 .td-context-menu .combobox__button {
@@ -172,7 +141,6 @@ td input {
     border: 1px solid transparent;
     border-radius: 4px;
     background-position: -887px -351px;
-    ;
 }
 
 .td-context-menu .combobox__button:hover {
@@ -181,20 +149,21 @@ td input {
 
 .td-context-menu .combobox__button:focus {
     background-color: transparent;
-    border: 1px solid #0075c0;
+    border: 1px solid #01836F;
 }
 
 .td-context-menu .btn-edit {
     border: unset;
     background-color: transparent;
     font-weight: 600;
-    color: #0075c0;
+    color: #01836F;
     cursor: pointer;
+    z-index: 5;
 }
 
-.td-context-menu .combobox__data {
-    right: 16px;
-    bottom: 0;
-    top: calc(100%);
-    z-index: 20;
+tr .combobox__data {
+    left: calc(100% - 320px);
+    z-index: 999;
+    max-width: 150px;
+    font: 400 14px Roboto-Regular;
 }

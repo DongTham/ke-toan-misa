@@ -1,0 +1,170 @@
+/* CSS Dialog */
+
+.dialog {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(85, 79, 79, 0.2);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.dialog-wrapper {
+    position: absolute;
+    min-width: 50%;
+}
+
+.dialog-container {
+    border: unset;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+    padding: 24px;
+    row-gap: 24px;
+    font: 400 14px Roboto-Regular;
+    color: #1F1F1F;
+    line-height: 18px;
+}
+
+
+/* CSS Dialog Header */
+
+.dialog__header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.dialog-header__title {
+    display: flex;
+    align-items: center;
+}
+
+.header-title {
+    font: 700 20px Roboto-Bold;
+}
+
+.header-checkbox {
+    display: flex;
+    padding: 0 16px;
+    align-items: center;
+}
+
+.header-checkbox input {
+    height: 20px;
+    width: 20px;
+    margin: 0;
+    outline: none;
+}
+
+.header-checkbox span {
+    padding-left: 8px;
+}
+
+.dialog-header__button {
+    position: relative;
+    background-color: transparent;
+    border: unset;
+    outline: none;
+    padding: 0;
+}
+
+.btn-close {
+    background-position: -1172px -356px;
+    height: 24px;
+    width: 24px;
+}
+
+
+/* CSS Dialog Content */
+
+.dialog__content {
+    position: relative;
+    padding: 24px 0;
+}
+
+.dialog-content__field {
+    display: flex;
+    align-items: center;
+}
+
+.field-left {
+    display: flex;
+    width: 50%;
+}
+
+.field-right {
+    display: flex;
+    width: 50%;
+}
+
+.field-left+.field-right {
+    margin-left: 16px;
+}
+
+.content-checkbox {
+    display: grid;
+    margin-top: 16px;
+    margin-right: 8px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.content-checkbox__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+}
+
+.content-checkbox__wrapper input {
+    height: 20px;
+    width: 20px;
+    outline: none;
+    margin: 0;
+}
+
+input[type="radio"] {
+    /* remove standard background appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* create custom radiobutton appearance */
+    display: inline-block;
+    padding: 3px;
+    /* background-color only for content */
+    background-clip: content-box;
+    border: 1px solid #bbbbbb;
+    border-radius: 50%;
+}
+
+
+/* appearance for checked radiobutton */
+
+input[type="radio"]:checked {
+    background-color: #089740;
+    border: 1px solid #089740;
+}
+
+.content-checkbox__wrapper span {
+    padding: 0 8px;
+}
+
+.content-checkbox>label {
+    font-weight: 700;
+}
+
+
+/* CSS Dialog Footer */
+
+.dialog__footer {
+    border-top: 1px solid #E0E0E0;
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+}

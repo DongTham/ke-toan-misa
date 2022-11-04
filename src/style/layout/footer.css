@@ -33,12 +33,11 @@
 }
 
 .pagination .btn-pagination:hover {
-    background-color: #E0E0E0;
+    background-color: #CCECE7;
 }
 
 .pagination .active-item,
 .pagination .active-item:hover {
     color: #FFFFFF;
-    font-weight: 700;
-    background-color: #50B83C;
+    background-color: #01A38A;
 }

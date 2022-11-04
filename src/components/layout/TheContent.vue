@@ -35,54 +35,44 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th></th>
-                                    <th>
-                                        <input type="checkbox">
+                                    <th class="ms-hidden"></th>
+                                    <th class="ms-th-viewer ms-sticky">
+                                        <input type="checkbox" @click="checkAllItems" v-bind:checked="selectedEmpolyee.length == employeeList.length">
                                     </th>
-                                    <th>MÃ NHÂN VIÊN</th>
-                                    <th>TÊN NHÂN VIÊN</th>
-                                    <th>GIỚI TÍNH</th>
-                                    <th>NGÀY SINH</th>
-                                    <th>SỐ CMND</th>
-                                    <th>NƠI CẤP</th>
-                                    <th>TÊN ĐƠN VỊ</th>
-                                    <th>SỐ TÀI KHOẢN</th>
-                                    <th>TÊN NGÂN HÀNG</th>
-                                    <th>CHI NHÁNH TK NGÂN HÀNG</th>
-                                    <th>CHỨC NĂNG</th>
-                                    <th></th>
-                                    <th></th>
+                                    <th class="ms-th-viewer" v-for="(item, index) in headerTableName" :key="index">{{item.Name}}</th>
+                                    <th class="ms-th-viewer ms-sticky">Chức năng</th>
+                                    <th class="ms-hidden"></th>
+                                    <th class="ms-hidden"></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(item, index) in employeeList" :key="index">
-                                    <td></td>
-                                    <td>
-                                        <input type="checkbox">
+                                <tr v-for="(item, index) in employeeList" :key="index" v-bind:tabindex="index">
+                                    <td class="ms-hidden"></td>
+                                    <td class="ms-td-viewer ms-sticky">
+                                        <input type="checkbox" @click="checkSingleItem(item.EmployeeId)" v-bind:checked="isCheckItem(item.EmployeeId)">
                                     </td>
-                                    <td>{{item.EmployeeCode}}</td>
-                                    <td>{{item.EmployeeName}}</td>
-                                    <td>{{item.Gender == 0 ? 'Nam': item.Gender == 1 ? 'Nữ' : item.Gender == 2 ? 'Khác' : item.Gender }}</td>
-                                    <td>{{date(item.DateOfBirth)}}</td>
-                                    <td>{{item.IdentityNumber}}</td>
-                                    <td>{{item.IdentityPlace}}</td>
-                                    <td>{{item.DepartmentName}}</td>
-                                    <td>{{item.BankAccountNumber}}</td>
-                                    <td>{{item.BankName}}</td>
-                                    <td>{{item.BankBranchName}}</td>
-                                    <td class="td-context-menu">
-                                        <button class="btn-edit">Sửa</button>
-                                        <div class="select-contextmenu">
-                                            <the-button class="btn-selectdown combobox__button" @click="handleSelectContextMenu(index)"></the-button>
-                                            <div class="combobox__data" v-show="showSelectContextMenu == index ? true : false">
-                                                <div class="data-item">Nhân bản</div>
-                                                <div class="data-item">Xóa</div>
-                                                <div class="data-item">Ngừng sử dụng</div>
-                                            </div>
-                                        </div>
+                                    <td class="ms-td-viewer">{{item.EmployeeCode}}</td>
+                                    <td class="ms-td-viewer">{{item.EmployeeName}}</td>
+                                    <td class="ms-td-viewer">{{item.Gender == 0 ? 'Nam': item.Gender == 1 ? 'Nữ' : item.Gender == 2 ? 'Khác' : item.Gender }}</td>
+                                    <td class="ms-td-viewer">{{convertFormatDate(item.DateOfBirth)}}</td>
+                                    <td class="ms-td-viewer">{{item.IdentityNumber}}</td>
+                                    <td class="ms-td-viewer">{{item.IdentityPlace}}</td>
+                                    <td class="ms-td-viewer">{{item.DepartmentName}}</td>
+                                    <td class="ms-td-viewer">{{item.BankAccountNumber}}</td>
+                                    <td class="ms-td-viewer">{{item.BankName}}</td>
+                                    <td class="ms-td-viewer">{{item.BankBranchName}}</td>
+                                    <div class="combobox__data" v-show="showSelectContextMenu == index ? true : false">
+                                        <div class="data-item">Nhân bản</div>
+                                        <div class="data-item">Xóa</div>
+                                        <div class="data-item">Ngừng sử dụng</div>
+                                    </div>
+                                    
+                                    <td class="ms-td-viewer ms-sticky td-context-menu">
+                                            <button class="btn-edit">Sửa</button>
+                                            <the-button class="btn-selectdown combobox__button" @click="handleSelectContextMenu(index)"></the-button>                                 
                                     </td>
-                                    <td></td>
-                                    <td></td>
+                                    <td class="ms-hidden"></td>
+                                    <td class="ms-hidden"></td>
                                 </tr> 
                             </tbody>
                         </table>
@@ -113,8 +103,9 @@
 </template>
   
 <script>
-import TheButton from '../base/TheButton.vue'
+import TheButton from '../base/TheButton.vue';
 import {selectPageSize} from '../../i18n/i18nCommon'
+import { headerTableName } from "../../i18n/i18nCommon";
 import moment from 'moment';
 
 export default {
@@ -142,26 +133,55 @@ export default {
                 me.employeeList = data.Data;
                 me.numberRecords = data.TotalRecord;
                 me.totalPages = data.TotalPage;
+            }).catch((error) =>{
+                if(me.pageNumber != 1){
+                    me.pageNumber = 1;
+                    me.getAllData();
+                } else{
+                    console.log(error);
+                }
             })
         },
 
-        date(date) {
+        convertFormatDate(date) {
             return date ? moment(date).format('DD/MM/YYYY') : date;
+        },
+
+        isCheckItem(el){
+            const me = this;
+            return me.selectedEmpolyee.includes(el);
+        },
+
+        checkAllItems(){
+            const me = this;
+            if(me.selectedEmpolyee.length == me.employeeList.length){
+                me.selectedEmpolyee.length = 0;
+            } else{
+                me.selectedEmpolyee.length = 0;
+                me.employeeList.forEach(value => me.selectedEmpolyee.push(value.EmployeeId));
+            }
+        },
+
+        checkSingleItem(el){
+            const me = this;
+            const index = me.selectedEmpolyee.indexOf(el);
+            if(index  > -1){
+                me.selectedEmpolyee.splice(index, 1);
+            } else{
+                me.selectedEmpolyee.push(el);
+            }
+            
         },
 
         handleShowPageSize(){
             const me = this;
             me.showSelectPageSize = me.showSelectPageSize ? false : true;
         },
-        
-        handleSelectContextMenu(index){
-            const me = this;
-            me.showSelectContextMenu = index;
-        },
 
         handleSelectPageSize(el){
             const me = this;
             me.showSelectPageSize = false;
+            me.selectedEmpolyee.length = 0;
             me.pageSize = el;
             me.getAllData();
         },
@@ -169,8 +189,14 @@ export default {
         handleChangePage(el){
             const me = this;
             me.pageNumber = el;
+            me.selectedEmpolyee.length = 0;
             me.getAllData();
-        }
+        },
+
+        handleSelectContextMenu(index){
+            const me = this;
+            me.showSelectContextMenu = index;
+        },
     },
     data(){
         return{
@@ -182,8 +208,10 @@ export default {
             numberRecords: 0,
             totalPages: 0,
             selectPageSize: selectPageSize,
+            headerTableName: headerTableName,
             disableButtonPrev: true,
-            disableButtonNext: false
+            disableButtonNext: false,
+            selectedEmpolyee: []
         }
     }
 }

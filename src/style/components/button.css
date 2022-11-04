@@ -4,7 +4,7 @@
     padding: 0 16px;
     border: unset;
     border-radius: 4px;
-    background-color: #50B83C;
+    background-color: #01A38A;
     font-size: 14px;
     font-weight: 500;
     font-family: Roboto-Medium;
@@ -15,11 +15,11 @@
 }
 
 .btn:hover {
-    background-color: #73C663;
+    background-color: #34B6A2;
 }
 
 .btn:focus {
-    background-color: #409330;
+    background-color: #01836F;
 }
 
 .btn-icon {
