@@ -4,7 +4,7 @@
     align-items: center;
     padding: 16px;
     margin: 20px 0 0 0;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     position: sticky;
     left: 0;
 }
@@ -55,8 +55,8 @@
 
 .main__body-function .btn-search {
     position: absolute;
-    right: 12px;
-    background-position: -425px -33px;
+    right: 1px;
+    background-position: -416px -28px;
 }
 
 .function-left .batch-operation {
@@ -79,6 +79,6 @@
     background-color: transparent;
     right: 0;
     background-position: -558px -357px;
-    opacity: .5;
+    opacity: 0.5;
     margin-left: 4px;
 }
