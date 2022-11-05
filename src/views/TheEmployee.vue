@@ -1,7 +1,7 @@
 <template>
-  <div class="dialog">
+  <div class="dialog" v-if="showEmployeeForm">
     <div class="dialog-wrapper employee-form">
-      <form action="" class="dialog-container">
+      <form class="dialog-container">
         <div class="dialog__header">
           <div class="dialog-header__title">
             <span class="header-title">Thông tin nhân viên</span>
@@ -15,6 +15,8 @@
             </div>
           </div>
           <the-button
+            v-on:click="handleCloseForm"
+            type="close"
             class="dialog-header__button"
             buttonIconClass="btn-icon btn-close"
           ></the-button>
@@ -91,6 +93,7 @@
 import { ref } from '@vue/reactivity';
 import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
+import { EventBus } from '../i18n/i18nEventBus';
 // import TheDropDown from '@/components/base/TheDropDown.vue';
 
 export default {
@@ -99,19 +102,33 @@ export default {
     TheButton,
     TextField,
   },
-  props: {},
+  props: {
+    // showEmployeeForm: {
+    //   type: Boolean,
+    //   default: true,
+    // },
+  },
   emits: [],
   setup() {
     const count = ref(0);
+    EventBus.$on('showEmployeeForm', this.handleCloseForm);
     return {
       count,
     };
   },
-  methods: {},
-  data() {
-    return {};
+  methods: {
+    handleCloseForm() {
+      this.showEmployeeForm = !this.showEmployeeForm;
+    },
   },
-  mounted() {},
+  data() {
+    return {
+      showEmployeeForm: false,
+    };
+  },
+  mounted() {
+    EventBus.$off('showEmployeeForm', this.showEmployeeForm);
+  },
 };
 </script>
 

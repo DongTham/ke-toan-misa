@@ -4,16 +4,16 @@
     <div class="content">
       <the-header></the-header>
       <the-content></the-content>
-      <the-employee></the-employee>
     </div>
   </div>
+  <the-employee></the-employee>
 </template>
 
 <script>
-import TheHeader from './components/layout/TheHeader.vue'
-import TheSidebar from './components/layout/TheSidebar.vue'
-import TheContent from './components/layout/TheContent.vue'
-import TheEmployee from './views/TheEmployee.vue'
+import TheHeader from './components/layout/TheHeader.vue';
+import TheSidebar from './components/layout/TheSidebar.vue';
+import TheContent from './components/layout/TheContent.vue';
+import TheEmployee from './views/TheEmployee.vue';
 
 export default {
   name: 'App',
@@ -21,9 +21,9 @@ export default {
     TheHeader,
     TheSidebar,
     TheContent,
-    TheEmployee
-  }
-}
+    TheEmployee,
+  },
+};
 </script>
 
 <style>
