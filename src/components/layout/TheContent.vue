@@ -166,7 +166,6 @@ import TheButton from '../base/TheButton.vue';
 import { selectPageSize } from '../../i18n/i18nCommon';
 import { headerTableName } from '../../i18n/i18nCommon';
 import moment from 'moment';
-import { EventBus } from '../../i18n/i18nEventBus';
 
 export default {
   name: 'TheContent',
@@ -262,7 +261,7 @@ export default {
     },
 
     handleShowEmployeeForm() {
-      EventBus.$emit('showEmployeeForm', true);
+      this.$emit('handleCloseForm', true);
     },
   },
   data() {

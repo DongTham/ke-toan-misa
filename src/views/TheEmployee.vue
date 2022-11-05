@@ -15,7 +15,7 @@
             </div>
           </div>
           <the-button
-            v-on:click="handleCloseForm"
+            @click="handleCloseForm(fasle)"
             type="close"
             class="dialog-header__button"
             buttonIconClass="btn-icon btn-close"
@@ -93,7 +93,6 @@
 import { ref } from '@vue/reactivity';
 import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
-import { EventBus } from '../i18n/i18nEventBus';
 // import TheDropDown from '@/components/base/TheDropDown.vue';
 
 export default {
@@ -111,14 +110,14 @@ export default {
   emits: [],
   setup() {
     const count = ref(0);
-    EventBus.$on('showEmployeeForm', this.handleCloseForm);
+
     return {
       count,
     };
   },
   methods: {
-    handleCloseForm() {
-      this.showEmployeeForm = !this.showEmployeeForm;
+    handleCloseForm(el) {
+      this.showEmployeeForm = el;
     },
   },
   data() {
@@ -126,9 +125,7 @@ export default {
       showEmployeeForm: false,
     };
   },
-  mounted() {
-    EventBus.$off('showEmployeeForm', this.showEmployeeForm);
-  },
+  mounted() {},
 };
 </script>
 
