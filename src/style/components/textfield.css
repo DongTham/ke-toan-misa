@@ -1,16 +1,19 @@
 .field {
     display: grid;
-    margin-top: 16px;
-    margin-right: 8px;
+    margin-bottom: 24px;
     position: relative;
     overflow: hidden;
     width: 100%;
 }
 
+.field+.field {
+    margin-left: 8px;
+}
+
 .field input {
     font: 400 14px Roboto-Regular;
-    background-color: #FFFFFF;
-    border: 1px solid #EBEBEB;
+    background-color: #ffffff;
+    border: 1px solid #ebebeb;
     border-radius: 4px;
     margin-top: 8px;
     padding: 0 12px;
@@ -24,27 +27,27 @@
 input:hover~.btn-check,
 input:hover~.btn-verify,
 input:hover~.btn-search {
-    background-color: #F6F6F6;
+    background-color: #f6f6f6;
 }
 
 .field label {
-    color: #1F1F1F;
+    color: #1f1f1f;
     font-weight: 700;
 }
 
 .field input::placeholder {
     font: 400 14px Roboto-Regular;
-    color: #9E9E9E;
+    color: #9e9e9e;
     line-height: 18px;
 }
 
 .btn-search {
     position: absolute;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     color: #666666;
     border-radius: 0 3px 3px 0;
     font-size: 16px;
-    border: 0px solid #EBEBEB;
+    border: 0px solid #ebebeb;
     z-index: 2;
     height: 34px;
     width: 40px;
@@ -62,28 +65,28 @@ input:hover~.btn-search {
 .field-verify:focus,
 .field-action-search:focus {
     outline: none;
-    border-color: #50B83C;
+    border-color: #50b83c;
 }
 
 input.field-error {
-    border-color: #E61D1D;
+    border-color: #e61d1d;
     margin-bottom: 8px;
 }
 
 .field-error:focus {
     outline: none;
-    border-color: #6500FF;
+    border-color: #6500ff;
 }
 
 .field p {
     margin: 0;
-    color: #E61D1D;
+    color: #e61d1d;
     font-size: 12px;
 }
 
 input.field-readonly {
-    background-color: #EBEBEB;
-    border-color: #E0E0E0;
+    background-color: #ebebeb;
+    border-color: #e0e0e0;
     line-height: 11px;
     color: #666666;
 }
@@ -94,15 +97,15 @@ input.field-readonly {
 
 input.field-valid,
 input.field-verify {
-    border-color: #50B83C;
+    border-color: #50b83c;
     color: #212121;
 }
 
 .btn-check,
 .btn-verify {
     position: absolute;
-    color: #50B83C;
-    background-color: #FFFFFF;
+    color: #50b83c;
+    background-color: #ffffff;
     font-size: 16px;
     border: unset;
     z-index: 2;
@@ -115,5 +118,5 @@ input.field-verify {
 }
 
 .btn-search:focus {
-    background-color: #EBEBEB;
+    background-color: #ebebeb;
 }

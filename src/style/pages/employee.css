@@ -21,11 +21,10 @@
 .dialog-container {
     border: unset;
     border-radius: 4px;
-    background-color: #FFFFFF;
-    padding: 24px;
-    row-gap: 24px;
+    background-color: #ffffff;
+    padding: 32px;
     font: 400 14px Roboto-Regular;
-    color: #1F1F1F;
+    color: #1f1f1f;
     line-height: 18px;
 }
 
@@ -43,7 +42,7 @@
 }
 
 .header-title {
-    font: 700 20px Roboto-Bold;
+    font: 700 24px Roboto-Bold;
 }
 
 .header-checkbox {
@@ -82,7 +81,7 @@
 
 .dialog__content {
     position: relative;
-    padding: 24px 0;
+    padding: 32px 0;
 }
 
 .dialog-content__field {
@@ -101,13 +100,16 @@
 }
 
 .field-left+.field-right {
-    margin-left: 16px;
+    margin-left: 24px;
+}
+
+.input-date {
+    width: 80%;
 }
 
 .content-checkbox {
     display: grid;
-    margin-top: 16px;
-    margin-right: 8px;
+    margin: 0 0 24px 8px;
     position: relative;
     overflow: hidden;
     width: 100%;
@@ -124,12 +126,19 @@
 
 .content-checkbox__wrapper input {
     height: 20px;
+    min-height: 20px;
     width: 20px;
+    min-width: 20px;
     outline: none;
     margin: 0;
 }
 
-input[type="radio"] {
+.content-checkbox__wrapper span+input {
+    margin-left: 4px;
+}
+
+input[type='radio'],
+input[type='checkbox'] {
     /* remove standard background appearance */
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -143,10 +152,15 @@ input[type="radio"] {
     border-radius: 50%;
 }
 
+input[type='checkbox'] {
+    border-radius: 4px;
+}
+
 
 /* appearance for checked radiobutton */
 
-input[type="radio"]:checked {
+input[type='radio']:checked,
+input[type='checkbox']:checked {
     background-color: #089740;
     border: 1px solid #089740;
 }
@@ -163,8 +177,29 @@ input[type="radio"]:checked {
 /* CSS Dialog Footer */
 
 .dialog__footer {
-    border-top: 1px solid #E0E0E0;
-    padding-top: 24px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 32px;
     display: flex;
     justify-content: space-between;
+}
+
+.btn-cancel,
+.btn-add {
+    background-color: #ffffff;
+    border-radius: 3px;
+    border: 1px solid #e0e0e0;
+}
+
+.btn-cancel:hover,
+.btn-add:hover {
+    background-color: #f1f1f1;
+}
+
+.btn-add-renew {
+    background-color: #089740;
+    color: #ffffff;
+}
+
+.footer-right button+button {
+    margin-left: 12px;
 }
