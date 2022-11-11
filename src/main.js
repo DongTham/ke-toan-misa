@@ -1,11 +1,10 @@
 import { createApp } from 'vue';
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 import App from './App.vue';
-import { store } from './js/library/store';
+import { storeConfigs } from './store/baseStore.js';
 
 const app = createApp(App);
+const store = createStore(storeConfigs);
 
-app.use(Vuex);
 app.use(store);
-
 app.mount('#app');

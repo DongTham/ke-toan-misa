@@ -6,9 +6,7 @@
           <span>Nhân viên</span>
         </div>
         <div class="main__header-add">
-          <button @click="handleShowEmployeeForm(true)" class="btn btn-add">
-            Thêm mới nhân viên
-          </button>
+          <button class="btn btn-add" @click="handleOpenEmployeeForm">Thêm mới nhân viên</button>
         </div>
       </div>
     </div>
@@ -41,7 +39,7 @@
                 <input
                   type="checkbox"
                   @click="checkAllItems"
-                  v-bind:checked="selectedEmpolyee.length == employeeList.length"
+                  v-bind:checked="selectedEmpolyee.length == employeesList.length"
                 />
               </th>
               <th class="ms-th-viewer" v-for="(item, index) in headerTableName" :key="index">
@@ -53,7 +51,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in employeeList" :key="index" v-bind:tabindex="index">
+            <tr v-for="(item, index) in employeesList" :key="index" v-bind:tabindex="index">
               <td class="ms-hidden"></td>
               <td class="ms-td-viewer ms-sticky">
                 <input
@@ -75,7 +73,7 @@
                     : item.Gender
                 }}
               </td>
-              <td class="ms-td-viewer">{{ convertFormatDate(item.DateOfBirth) }}</td>
+              <td class="ms-td-viewer">{{ customizeDateTime(item.DateOfBirth) }}</td>
               <td class="ms-td-viewer">{{ item.IdentityNumber }}</td>
               <td class="ms-td-viewer">{{ item.IdentityPlace }}</td>
               <td class="ms-td-viewer">{{ item.DepartmentName }}</td>
@@ -159,138 +157,131 @@
       </div>
     </div>
   </div>
-  <the-employee
-    :showEmployeeForm="showEmployeeForm"
-    @handleShowEmployeeForm="handleShowEmployeeForm($event)"
-  ></the-employee>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from 'vue';
+import { useStore } from 'vuex';
 import TheButton from '../base/TheButton.vue';
 import { selectPageSize } from '../../i18n/i18nCommon';
 import { headerTableName } from '../../i18n/i18nCommon';
-import moment from 'moment';
-import axios from 'axios';
-import TheEmployee from '../../views/TheEmployee.vue';
+import { customizeDateTime } from '@/js/funtions/convertDateTime';
 
-export default {
-  name: 'TheContent',
-  components: {
-    TheButton,
-    TheEmployee,
-  },
-  props: {},
-  emits: [],
-  created() {
-    const me = this;
-    me.getAllData();
-  },
-  methods: {
-    getAllData() {
-      const me = this;
-      axios({
-        method: 'GET',
-        url: `https://localhost:44375/api/v1/Employees/filter?pageSize=${me.pageSize}&pageNumber=${me.pageNumber}`,
-      })
-        .then((response) => {
-          me.employeeList = response.data.employeeList;
-          me.numberRecords = response.data.totalRecord;
-          me.totalPages = response.data.totalPage;
-        })
-        .catch((error) => {
-          if (me.pageNumber != 1) {
-            me.pageNumber = 1;
-            me.getAllData();
-          } else {
-            console.log(error);
-          }
-        });
-    },
+const showSelectPageSize = ref(false);
+const showSelectContextMenu = ref();
+let pageSize = ref(20);
+const pageNumber = ref(1);
+const numberRecords = ref(0);
+const totalPages = ref(0);
+const disableButtonPrev = ref(true);
+const disableButtonNext = ref(false);
+const selectedEmpolyee = ref([]);
 
-    convertFormatDate(date, formatString = 'DD/MM/YYYY') {
-      return date ? moment(date).format(formatString) : date;
-    },
+const store = useStore();
 
-    isCheckItem(el) {
-      const me = this;
-      return me.selectedEmpolyee.includes(el);
-    },
-
-    checkAllItems() {
-      const me = this;
-      if (me.selectedEmpolyee.length == me.employeeList.length) {
-        me.selectedEmpolyee.length = 0;
-      } else {
-        me.selectedEmpolyee.length = 0;
-        me.employeeList.forEach((value) => me.selectedEmpolyee.push(value.EmployeeID));
-      }
-    },
-
-    checkSingleItem(el) {
-      const me = this;
-      const index = me.selectedEmpolyee.indexOf(el);
-      if (index > -1) {
-        me.selectedEmpolyee.splice(index, 1);
-      } else {
-        me.selectedEmpolyee.push(el);
-      }
-
-      // const a = {
-      //   name: 'Dong'
-      // };
-
-      //const b = {...a};
-      //const b = Object.assign({}, a);
-      //const b = JSON.parse(JSON.stringify(a));
-    },
-
-    handleShowPageSize() {
-      const me = this;
-      me.showSelectPageSize = me.showSelectPageSize ? false : true;
-    },
-
-    handleSelectPageSize(el) {
-      const me = this;
-      me.showSelectPageSize = false;
-      me.selectedEmpolyee.length = 0;
-      me.pageSize = el;
-      me.getAllData();
-    },
-
-    handleChangePage(el) {
-      const me = this;
-      me.pageNumber = el;
-      me.selectedEmpolyee.length = 0;
-      me.getAllData();
-    },
-
-    handleSelectContextMenu(index) {
-      const me = this;
-      me.showSelectContextMenu = index;
-    },
-
-    handleShowEmployeeForm(data) {
-      this.showEmployeeForm = data;
-    },
-  },
-  data() {
-    return {
-      showEmployeeForm: false,
-      showSelectPageSize: false,
-      showSelectContextMenu: -1,
-      employeeList: [],
-      pageSize: 20,
-      pageNumber: 1,
-      numberRecords: 0,
-      totalPages: 0,
-      selectPageSize: selectPageSize,
-      headerTableName: headerTableName,
-      disableButtonPrev: true,
-      disableButtonNext: false,
-      selectedEmpolyee: [],
-    };
-  },
+store.dispatch('getDepartmentsByPaging', { pageSize, pageNumber });
+const handleOpenEmployeeForm = () => {
+  store.dispatch('handleCloseOrOpenEmployeeForm', true);
 };
+
+const employeesList = computed(() => store.getters.employeesList);
+
+const isCheckItem = (el) => {
+  return selectedEmpolyee.value.includes(el);
+};
+
+const checkAllItems = () => {
+  if (selectedEmpolyee.value.length == employeesList.value.length) {
+    selectedEmpolyee.value.length = 0;
+  } else {
+    selectedEmpolyee.value.length = 0;
+    employeesList.value.forEach((value) => selectedEmpolyee.value.push(value.EmployeeID));
+  }
+};
+
+const checkSingleItem = (el) => {
+  const index = selectedEmpolyee.value.indexOf(el);
+  if (index > -1) {
+    selectedEmpolyee.value.splice(index, 1);
+  } else {
+    selectedEmpolyee.value.push(el);
+  }
+
+  //const b = {...a};
+  //const b = Object.assign({}, a);
+  //const b = JSON.parse(JSON.stringify(a));
+};
+
+//   created() {
+//     const me = this;
+
+//   },
+//   methods: {
+//     getAllData() {
+//       const me = this;
+//       axios({
+//         method: 'GET',
+//         url: `https://localhost:7228/api/v1/Employees/filter?pageSize=${me.pageSize}&pageNumber=${me.pageNumber}`,
+//       })
+//         .then((response) => {
+//           me.employeeList = response.data.employeeList;
+//           me.numberRecords = response.data.totalRecord;
+//           me.totalPages = response.data.totalPage;
+//         })
+//         .catch((error) => {
+//           if (me.pageNumber != 1) {
+//             me.pageNumber = 1;
+//             me.getAllData();
+//           } else {
+//             console.log(error);
+//           }
+//         });
+//     },
+
+//     handleShowPageSize() {
+//       const me = this;
+//       me.showSelectPageSize = me.showSelectPageSize ? false : true;
+//     },
+
+//     handleSelectPageSize(el) {
+//       const me = this;
+//       me.showSelectPageSize = false;
+//       me.selectedEmpolyee.length = 0;
+//       me.pageSize = el;
+//       me.getAllData();
+//     },
+
+//     handleChangePage(el) {
+//       const me = this;
+//       me.pageNumber = el;
+//       me.selectedEmpolyee.length = 0;
+//       me.getAllData();
+//     },
+
+//     handleSelectContextMenu(index) {
+//       const me = this;
+//       me.showSelectContextMenu = index;
+//     },
+
+//     ...mapMutations(['handleShowEmployeeForm']),
+//   },
+//   data() {
+//     return {
+//       showSelectPageSize: false,
+//       showSelectContextMenu: -1,
+//       employeeList: [],
+//       pageSize: 20,
+//       pageNumber: 1,
+//       numberRecords: 0,
+//       totalPages: 0,
+//       selectPageSize: selectPageSize,
+//       headerTableName: headerTableName,
+//       disableButtonPrev: true,
+//       disableButtonNext: false,
+//       selectedEmpolyee: [],
+//     };
+//   },
+// };
 </script>
 
 <style scoped>

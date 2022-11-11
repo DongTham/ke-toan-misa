@@ -4,7 +4,7 @@
       <form class="dialog-container">
         <div class="dialog__header">
           <div class="dialog-header__title">
-            <span class="header-title">Thông tin nhân viên</span>
+            <span class="header-title">Thông tin nhân viên </span>
             <div class="header-checkbox">
               <input type="checkbox" />
               <span>Là khách hàng</span>
@@ -15,6 +15,7 @@
             </div>
           </div>
           <the-button
+            @click="handleCloseEmployeeForm"
             class="dialog-header__button"
             buttonIconClass="btn-icon btn-close"
           ></the-button>
@@ -44,7 +45,7 @@
           <div class="dialog-content__field">
             <div class="field-left">
               <div class="combobox__data">
-                <div class="data-item" v-for="(item, index) in departmentList" :key="index">
+                <div class="data-item" v-for="(item, index) in departmentsList" :key="index">
                   {{ item.DepartmentName }}
                 </div>
               </div>
@@ -80,7 +81,11 @@
           </div>
         </div>
         <div class="dialog__footer">
-          <the-button class="btn btn-cancel" titleExtra="Hủy"></the-button>
+          <the-button
+            class="btn btn-cancel"
+            titleExtra="Hủy"
+            @click="handleCloseEmployeeForm"
+          ></the-button>
           <div class="footer-right">
             <the-button class="btn btn-add" titleExtra="Cất"></the-button>
             <the-button class="btn btn-add-renew" titleExtra="Cất và Thêm"></the-button>
@@ -91,51 +96,21 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
+import { useStore } from 'vuex';
+import { computed } from 'vue';
 // import TheDropDown from '@/components/base/TheDropDown.vue';
 
-export default {
-  name: 'TheEmployee',
-  components: {
-    TheButton,
-    TextField,
-  },
-  props: {
-    showEmployeeForm: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: {},
-  created() {
-    this.getAllDepertments();
-  },
-  methods: {
-    getAllDepertments() {
-      const me = this;
-      fetch('https://amis.manhnv.net/api/v1/Departments', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          me.departmentList = data;
-        });
-    },
-    handleCloseForm() {
-      this.$emit('handleShowEmployeeForm', false);
-    },
-  },
-  data() {
-    return {
-      departmentList: [],
-    };
-  },
-  mounted() {},
+const store = useStore();
+
+store.dispatch('getAllDepartments');
+const showEmployeeForm = computed(() => store.getters.showEmployeeForm);
+const departmentsList = computed(() => store.getters.departmentsList);
+
+const handleCloseEmployeeForm = () => {
+  store.dispatch('handleCloseOrOpenEmployeeForm', false);
 };
 </script>
 
