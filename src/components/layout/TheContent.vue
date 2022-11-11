@@ -6,7 +6,7 @@
           <span>Nhân viên</span>
         </div>
         <div class="main__header-add">
-          <button v-on:click="handleShowEmployeeForm" class="btn btn-add">
+          <button @click="handleShowEmployeeForm(true)" class="btn btn-add">
             Thêm mới nhân viên
           </button>
         </div>
@@ -58,8 +58,8 @@
               <td class="ms-td-viewer ms-sticky">
                 <input
                   type="checkbox"
-                  @click="checkSingleItem(item.EmployeeId)"
-                  v-bind:checked="isCheckItem(item.EmployeeId)"
+                  @click="checkSingleItem(item.EmployeeID)"
+                  v-bind:checked="isCheckItem(item.EmployeeID)"
                 />
               </td>
               <td class="ms-td-viewer">{{ item.EmployeeCode }}</td>
@@ -159,6 +159,10 @@
       </div>
     </div>
   </div>
+  <the-employee
+    :showEmployeeForm="showEmployeeForm"
+    @handleShowEmployeeForm="handleShowEmployeeForm($event)"
+  ></the-employee>
 </template>
 
 <script>
@@ -166,14 +170,17 @@ import TheButton from '../base/TheButton.vue';
 import { selectPageSize } from '../../i18n/i18nCommon';
 import { headerTableName } from '../../i18n/i18nCommon';
 import moment from 'moment';
+import axios from 'axios';
+import TheEmployee from '../../views/TheEmployee.vue';
 
 export default {
   name: 'TheContent',
   components: {
     TheButton,
+    TheEmployee,
   },
   props: {},
-  emits: ['showEmployeeForm'],
+  emits: [],
   created() {
     const me = this;
     me.getAllData();
@@ -181,20 +188,14 @@ export default {
   methods: {
     getAllData() {
       const me = this;
-      fetch(
-        `https://amis.manhnv.net/api/v1/Employees/filter?pageSize=${me.pageSize}&pageNumber=${me.pageNumber}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          me.employeeList = data.Data;
-          me.numberRecords = data.TotalRecord;
-          me.totalPages = data.TotalPage;
+      axios({
+        method: 'GET',
+        url: `https://localhost:44375/api/v1/Employees/filter?pageSize=${me.pageSize}&pageNumber=${me.pageNumber}`,
+      })
+        .then((response) => {
+          me.employeeList = response.data.employeeList;
+          me.numberRecords = response.data.totalRecord;
+          me.totalPages = response.data.totalPage;
         })
         .catch((error) => {
           if (me.pageNumber != 1) {
@@ -206,8 +207,8 @@ export default {
         });
     },
 
-    convertFormatDate(date) {
-      return date ? moment(date).format('DD/MM/YYYY') : date;
+    convertFormatDate(date, formatString = 'DD/MM/YYYY') {
+      return date ? moment(date).format(formatString) : date;
     },
 
     isCheckItem(el) {
@@ -221,7 +222,7 @@ export default {
         me.selectedEmpolyee.length = 0;
       } else {
         me.selectedEmpolyee.length = 0;
-        me.employeeList.forEach((value) => me.selectedEmpolyee.push(value.EmployeeId));
+        me.employeeList.forEach((value) => me.selectedEmpolyee.push(value.EmployeeID));
       }
     },
 
@@ -233,6 +234,14 @@ export default {
       } else {
         me.selectedEmpolyee.push(el);
       }
+
+      // const a = {
+      //   name: 'Dong'
+      // };
+
+      //const b = {...a};
+      //const b = Object.assign({}, a);
+      //const b = JSON.parse(JSON.stringify(a));
     },
 
     handleShowPageSize() {
@@ -260,12 +269,13 @@ export default {
       me.showSelectContextMenu = index;
     },
 
-    handleShowEmployeeForm() {
-      this.$emit('handleCloseForm', true);
+    handleShowEmployeeForm(data) {
+      this.showEmployeeForm = data;
     },
   },
   data() {
     return {
+      showEmployeeForm: false,
       showSelectPageSize: false,
       showSelectContextMenu: -1,
       employeeList: [],

@@ -6,14 +6,12 @@
       <the-content></the-content>
     </div>
   </div>
-  <the-employee></the-employee>
 </template>
 
 <script>
 import TheHeader from './components/layout/TheHeader.vue';
 import TheSidebar from './components/layout/TheSidebar.vue';
 import TheContent from './components/layout/TheContent.vue';
-import TheEmployee from './views/TheEmployee.vue';
 
 export default {
   name: 'App',
@@ -21,7 +19,6 @@ export default {
     TheHeader,
     TheSidebar,
     TheContent,
-    TheEmployee,
   },
 };
 </script>

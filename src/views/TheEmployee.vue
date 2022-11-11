@@ -15,8 +15,6 @@
             </div>
           </div>
           <the-button
-            @click="handleCloseForm(fasle)"
-            type="close"
             class="dialog-header__button"
             buttonIconClass="btn-icon btn-close"
           ></the-button>
@@ -45,7 +43,11 @@
 
           <div class="dialog-content__field">
             <div class="field-left">
-              <text-field Label="Đơn vị" IsValidate="true"></text-field>
+              <div class="combobox__data">
+                <div class="data-item" v-for="(item, index) in departmentList" :key="index">
+                  {{ item.DepartmentName }}
+                </div>
+              </div>
             </div>
             <div class="field-right">
               <text-field Label="Số CMND"></text-field>
@@ -90,7 +92,6 @@
 </template>
 
 <script>
-import { ref } from '@vue/reactivity';
 import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
 // import TheDropDown from '@/components/base/TheDropDown.vue';
@@ -102,27 +103,36 @@ export default {
     TextField,
   },
   props: {
-    // showEmployeeForm: {
-    //   type: Boolean,
-    //   default: true,
-    // },
+    showEmployeeForm: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: [],
-  setup() {
-    const count = ref(0);
-
-    return {
-      count,
-    };
+  emits: {},
+  created() {
+    this.getAllDepertments();
   },
   methods: {
-    handleCloseForm(el) {
-      this.showEmployeeForm = el;
+    getAllDepertments() {
+      const me = this;
+      fetch('https://amis.manhnv.net/api/v1/Departments', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          me.departmentList = data;
+        });
+    },
+    handleCloseForm() {
+      this.$emit('handleShowEmployeeForm', false);
     },
   },
   data() {
     return {
-      showEmployeeForm: false,
+      departmentList: [],
     };
   },
   mounted() {},
