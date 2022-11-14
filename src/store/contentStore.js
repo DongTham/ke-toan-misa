@@ -11,12 +11,14 @@ const contentStore = {
         async getDepartmentsByPaging(context, payload) {
             try {
                 const response = await axios.get(
-                    `https://localhost:7228/api/v1/Employees/filter?pageSize=${payload.pageSize.value}&pageNumber=${payload.pageNumber.value}`,
+                    `https://localhost:7228/api/v1/Employees/filter?pageSize=${payload.pageSize.value}&pageNumber=${payload.pageNumber.value}&keyword=${payload.keyword.value}`,
                 );
                 context.commit('updateEmployeesList', response.data.employees);
-                return {};
+                const totalRecords = response.data.totalRecord;
+                const totalPages = response.data.totalPage;
+                return { totalRecords, totalPages };
             } catch (error) {
-                console.log(error);
+                return error;
             }
         },
     },

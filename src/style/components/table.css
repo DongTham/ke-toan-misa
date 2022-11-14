@@ -1,7 +1,7 @@
 .main__body-table {
     display: flex;
     position: relative;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
 }
 
 table {
@@ -30,14 +30,14 @@ table thead th {
     text-align: left;
     top: -85px;
     z-index: 5;
-    background-color: #EEEEEE;
-    border-top: 1px solid #E0E0E0;
-    border-bottom: 1px solid #E0E0E0;
+    background-color: #eeeeee;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
 }
 
 table tbody td {
-    background-color: #FFFFFF;
-    border-bottom: 1px solid #E0E0E0;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
     font: 400 14px Roboto-Regular;
 }
 
@@ -75,7 +75,7 @@ tr th:nth-last-child(2) {
     min-width: 16px;
     max-width: 16px;
     width: 16px;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
 }
 
 tr th:last-child,
@@ -85,7 +85,7 @@ tr td:last-child {
     min-width: 24px;
     max-width: 24px;
     width: 24px;
-    background-color: #F7F7F7;
+    background-color: #f7f7f7;
 }
 
 tr th.ms-sticky,
@@ -97,12 +97,12 @@ tr td.ms-sticky {
 
 tr th:nth-last-child(3),
 tr td:nth-last-child(3) {
-    border-right: 1px solid #E0E0E0;
+    border-right: 1px solid #e0e0e0;
 }
 
 tr th:nth-child(2),
 tr td:nth-child(2) {
-    border-left: 1px solid #E0E0E0;
+    border-left: 1px solid #e0e0e0;
 }
 
 tr th:nth-child(2) {
@@ -114,12 +114,12 @@ tr:hover>th.ms-th-viewer {
 }
 
 tr:hover>td.ms-td-viewer {
-    background-color: #E6F6F3;
+    background-color: #e6f6f3;
 }
 
 tr:focus>td.ms-td-viewer,
 tr:has(input:checked)>td.ms-td-viewer {
-    background-color: #CCECE7;
+    background-color: #ccece7;
 }
 
 th input,
@@ -149,20 +149,23 @@ td input {
 
 .td-context-menu .combobox__button:focus {
     background-color: transparent;
-    border: 1px solid #01836F;
+    border: 1px solid #01836f;
 }
 
 .td-context-menu .btn-edit {
     border: unset;
     background-color: transparent;
     font-weight: 600;
-    color: #01836F;
+    color: #01836f;
     cursor: pointer;
     z-index: 5;
 }
 
 tr .combobox__data {
-    left: calc(100% - 320px);
+    position: sticky;
+    bottom: 100px;
+    right: 58px;
+    /* left: calc(100% - 320px); */
     z-index: 999;
     max-width: 150px;
     font: 400 14px Roboto-Regular;

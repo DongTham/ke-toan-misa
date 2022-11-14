@@ -23,13 +23,21 @@
         <div class="dialog__content">
           <div class="dialog-content__field">
             <div class="field-left">
-              <text-field Label="Mã" IsValidate="true" style="width: 65%"></text-field>
-              <text-field Label="Tên" IsValidate="true"></text-field>
+              <text-field
+                :Label="titleEmployeeDetails.EmployeeCode"
+                IsValidate="true"
+                style="width: 65%"
+              ></text-field>
+              <text-field :Label="titleEmployeeDetails.EmployeeName" IsValidate="true"></text-field>
             </div>
             <div class="field-right">
-              <text-field class="input-date" Label="Ngày sinh" Type="date"></text-field>
+              <text-field
+                class="input-date"
+                :Label="titleEmployeeDetails.DateOfBirth"
+                Type="date"
+              ></text-field>
               <div class="content-checkbox">
-                <label>Giới tính</label>
+                <label>{{ titleEmployeeDetails.Gender }}</label>
                 <div class="content-checkbox__wrapper">
                   <input type="radio" name="gender" />
                   <span>Nam</span>
@@ -44,40 +52,50 @@
 
           <div class="dialog-content__field">
             <div class="field-left">
-              <div class="combobox__data">
+              <text-field
+                :Label="titleEmployeeDetails.Department"
+                IsValidate="true"
+                Class="input-main combobox__input select__record-input"
+              ></text-field>
+              <button class="btn-selectdown combobox__button" @click="handleShowPageSize"></button>
+              <div class="combobox__data" v-if="isShowSelectDepartment">
                 <div class="data-item" v-for="(item, index) in departmentsList" :key="index">
                   {{ item.DepartmentName }}
                 </div>
               </div>
             </div>
             <div class="field-right">
-              <text-field Label="Số CMND"></text-field>
-              <text-field class="input-date" Label="Ngày cấp" Type="date"></text-field>
+              <text-field :Label="titleEmployeeDetails.IdentityNumber"></text-field>
+              <text-field
+                class="input-date"
+                :Label="titleEmployeeDetails.IdentityIssueDate"
+                Type="date"
+              ></text-field>
             </div>
           </div>
 
           <div class="dialog-content__field">
             <div class="field-left">
-              <text-field Label="Chức danh"></text-field>
+              <text-field :Label="titleEmployeeDetails.JobPosition"></text-field>
             </div>
             <div class="field-right">
-              <text-field Label="Nơi cấp"></text-field>
+              <text-field :Label="titleEmployeeDetails.IdentityIssuePlace"></text-field>
             </div>
           </div>
 
           <div class="dialog-content__field">
-            <text-field Label="Địa chỉ"></text-field>
+            <text-field :Label="titleEmployeeDetails.EmployeeAddress"></text-field>
           </div>
 
           <div class="dialog-content__field" style="width: 75%">
-            <text-field Label="ĐT di động"></text-field>
-            <text-field Label="ĐT cố định"></text-field>
-            <text-field Label="Email"></text-field>
+            <text-field :Label="titleEmployeeDetails.MobilePhone"></text-field>
+            <text-field :Label="titleEmployeeDetails.TelePhone"></text-field>
+            <text-field :Label="titleEmployeeDetails.Email"></text-field>
           </div>
           <div class="dialog-content__field" style="width: 75%">
-            <text-field Label="Tài khoản ngân hàng"></text-field>
-            <text-field Label="Tên ngân hàng"></text-field>
-            <text-field Label="Chi nhánh"></text-field>
+            <text-field :Label="titleEmployeeDetails.BankAccountNumber"></text-field>
+            <text-field :Label="titleEmployeeDetails.BankName"></text-field>
+            <text-field :Label="titleEmployeeDetails.BankBranchName"></text-field>
           </div>
         </div>
         <div class="dialog__footer">
@@ -100,8 +118,11 @@
 import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
 import { useStore } from 'vuex';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { titleEmployeeDetails } from '@/i18n/i18nCommon';
 // import TheDropDown from '@/components/base/TheDropDown.vue';
+
+const isShowSelectDepartment = ref(false);
 
 const store = useStore();
 

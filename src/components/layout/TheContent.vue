@@ -22,10 +22,16 @@
         </div>
         <div class="function-right">
           <div class="function__search">
-            <input type="text" class="input-main" placeholder="Tìm theo mã, tên nhân viên" />
-            <button class="btn-icon btn-search"></button>
+            <input
+              type="text"
+              v-model="keyword"
+              @keypress.enter="getEmployeesByFilterAndPaging"
+              class="input-main"
+              placeholder="Tìm theo mã, tên nhân viên"
+            />
+            <button @click="getEmployeesByFilterAndPaging" class="btn-icon btn-search"></button>
           </div>
-          <button class="btn-icon main__icon btn-reload"></button>
+          <button class="btn-icon main__icon btn-reload" @click="refreshEmployeesList"></button>
           <button class="btn-icon main__icon btn-export"></button>
           <button class="btn-icon main__icon btn-filter"></button>
         </div>
@@ -102,7 +108,7 @@
       <div class="main__body-footer">
         <div class="body__footer-left">
           <p>
-            Tổng số: <b>{{ numberRecords }}</b> bản ghi
+            Tổng số: <b>{{ totalRecords }}</b> bản ghi
           </p>
         </div>
         <div class="body__footer-right">
@@ -169,17 +175,38 @@ import { customizeDateTime } from '@/js/funtions/convertDateTime';
 
 const showSelectPageSize = ref(false);
 const showSelectContextMenu = ref();
-let pageSize = ref(20);
+const pageSize = ref(20);
 const pageNumber = ref(1);
-const numberRecords = ref(0);
+const totalRecords = ref(0);
 const totalPages = ref(0);
+const keyword = ref('');
 const disableButtonPrev = ref(true);
 const disableButtonNext = ref(false);
 const selectedEmpolyee = ref([]);
 
 const store = useStore();
 
-store.dispatch('getDepartmentsByPaging', { pageSize, pageNumber });
+const refreshEmployeesList = () => {
+  pageSize.value = 20;
+  pageNumber.value = 1;
+  keyword.value = '';
+  getEmployeesByFilterAndPaging();
+};
+
+const getEmployeesByFilterAndPaging = () => {
+  store
+    .dispatch('getDepartmentsByPaging', { pageSize, pageNumber, keyword })
+    .then((data) => {
+      totalRecords.value = data.totalRecords;
+      totalPages.value = data.totalPages;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
+getEmployeesByFilterAndPaging();
+
 const handleOpenEmployeeForm = () => {
   store.dispatch('handleCloseOrOpenEmployeeForm', true);
 };
@@ -212,76 +239,26 @@ const checkSingleItem = (el) => {
   //const b = JSON.parse(JSON.stringify(a));
 };
 
-//   created() {
-//     const me = this;
+const handleShowPageSize = () => {
+  showSelectPageSize.value = showSelectPageSize.value ? false : true;
+};
 
-//   },
-//   methods: {
-//     getAllData() {
-//       const me = this;
-//       axios({
-//         method: 'GET',
-//         url: `https://localhost:7228/api/v1/Employees/filter?pageSize=${me.pageSize}&pageNumber=${me.pageNumber}`,
-//       })
-//         .then((response) => {
-//           me.employeeList = response.data.employeeList;
-//           me.numberRecords = response.data.totalRecord;
-//           me.totalPages = response.data.totalPage;
-//         })
-//         .catch((error) => {
-//           if (me.pageNumber != 1) {
-//             me.pageNumber = 1;
-//             me.getAllData();
-//           } else {
-//             console.log(error);
-//           }
-//         });
-//     },
+const handleSelectPageSize = (el) => {
+  showSelectPageSize.value = false;
+  selectedEmpolyee.value.length = 0;
+  pageSize.value = el;
+  getEmployeesByFilterAndPaging();
+};
 
-//     handleShowPageSize() {
-//       const me = this;
-//       me.showSelectPageSize = me.showSelectPageSize ? false : true;
-//     },
+const handleChangePage = (el) => {
+  pageNumber.value = el;
+  selectedEmpolyee.value.length = 0;
+  getEmployeesByFilterAndPaging();
+};
 
-//     handleSelectPageSize(el) {
-//       const me = this;
-//       me.showSelectPageSize = false;
-//       me.selectedEmpolyee.length = 0;
-//       me.pageSize = el;
-//       me.getAllData();
-//     },
-
-//     handleChangePage(el) {
-//       const me = this;
-//       me.pageNumber = el;
-//       me.selectedEmpolyee.length = 0;
-//       me.getAllData();
-//     },
-
-//     handleSelectContextMenu(index) {
-//       const me = this;
-//       me.showSelectContextMenu = index;
-//     },
-
-//     ...mapMutations(['handleShowEmployeeForm']),
-//   },
-//   data() {
-//     return {
-//       showSelectPageSize: false,
-//       showSelectContextMenu: -1,
-//       employeeList: [],
-//       pageSize: 20,
-//       pageNumber: 1,
-//       numberRecords: 0,
-//       totalPages: 0,
-//       selectPageSize: selectPageSize,
-//       headerTableName: headerTableName,
-//       disableButtonPrev: true,
-//       disableButtonNext: false,
-//       selectedEmpolyee: [],
-//     };
-//   },
-// };
+const handleSelectContextMenu = (index) => {
+  showSelectContextMenu.value = index;
+};
 </script>
 
 <style scoped>
