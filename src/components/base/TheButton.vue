@@ -3,7 +3,7 @@
     <img v-bind:src="imageLink" alt="" v-bind:class="imageClass" v-show="imageLink" />
     <span v-bind:class="buttonTitleClass">{{ titleHeader }}</span>
     <div v-bind:class="buttonIconClass"></div>
-    {{ titleExtra }}
+    <span v-if="!isCollapse">{{ titleExtra }}</span>
   </button>
 </template>
 
@@ -37,6 +37,10 @@ export default {
     imageClass: {
       type: String,
       default: '',
+    },
+    isCollapse: {
+      type: Boolean,
+      default: false,
     },
   },
 

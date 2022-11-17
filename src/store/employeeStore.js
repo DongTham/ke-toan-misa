@@ -12,7 +12,7 @@ const employeeStore = {
     actions: {
         async getAllDepartments({ commit }) {
             try {
-                const response = await axios.get('https://localhost:7228/api/v1/Departments');
+                const response = await axios.get('https://localhost:44369/api/v1/Departments');
                 commit('updateDepartmentsList', response.data);
             } catch (error) {
                 console.log(error);

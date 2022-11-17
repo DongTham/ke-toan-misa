@@ -86,18 +86,28 @@
               <td class="ms-td-viewer">{{ item.BankAccountNumber }}</td>
               <td class="ms-td-viewer">{{ item.BankName }}</td>
               <td class="ms-td-viewer">{{ item.BankBranchName }}</td>
-              <div class="combobox__data" v-show="showSelectContextMenu == index ? true : false">
+              <!-- <div class="combobox__data" v-show="showSelectContextMenu == index ? true : false">
                 <div class="data-item">Nhân bản</div>
                 <div class="data-item">Xóa</div>
                 <div class="data-item">Ngừng sử dụng</div>
-              </div>
+              </div> -->
 
               <td class="ms-td-viewer ms-sticky td-context-menu">
                 <button class="btn-edit">Sửa</button>
-                <the-button
+                <!-- <the-button
                   class="btn-selectdown combobox__button"
                   @click="handleSelectContextMenu(index)"
-                ></the-button>
+                ></the-button> -->
+                <div
+                  @click="handleSelectContextMenu(index)"
+                  class="m-icon m-icon--dropdown"
+                  style="position: relative; border: 1px solid rgb(0, 117, 192)"
+                >
+                  <ul class="dropdownlist">
+                    <li class="dropdown__item">Nhân bản</li>
+                    <li class="dropdown__item">Xóa</li>
+                  </ul>
+                </div>
               </td>
               <td class="ms-hidden"></td>
               <td class="ms-hidden"></td>
@@ -112,15 +122,13 @@
           </p>
         </div>
         <div class="body__footer-right">
-          <div class="combobox select-record">
-            <input
-              type="text"
-              class="input-main combobox__input select__record-input"
-              v-bind:value="pageSize + ' bản ghi trên 1 trang'"
-              readonly
-            />
-            <button class="btn-selectdown combobox__button" @click="handleShowPageSize"></button>
-            <div class="combobox__data" v-show="showSelectPageSize">
+          <div class="select-record">
+            <p class="records-per-page-text">Số bản ghi/trang:</p>
+            <p class="records-per-page-number">
+              {{ pageSize }}
+            </p>
+            <button class="btn-icon btn-selectdown" @click="handleShowPageSize"></button>
+            <div class="select__record-data" v-show="showSelectPageSize">
               <div
                 class="data-item"
                 v-for="(item, index) in selectPageSize"
@@ -128,19 +136,23 @@
                 @click="handleSelectPageSize(item.Value)"
                 v-bind:class="item.Value == pageSize ? 'active-item' : ''"
               >
-                {{ item.Value }} bản ghi trên 1 trang
+                {{ item.Value }}
               </div>
             </div>
           </div>
+          <div>
+            <p>
+              <b>{{ numberRecordsStart }}</b> - <b>{{ numberRecordsEnd }}</b> bản ghi
+            </p>
+          </div>
 
           <button
-            class="btn btn-prev"
-            v-bind:disabled="pageNumber == 1 ? disableButtonPrev : !disableButtonPrev"
+            class="btn-icon"
+            v-bind:class="pageNumber == 1 ? 'btn-prev-disable' : 'btn-prev-active'"
+            v-bind:disabled="pageNumber == 1 ? true : false"
             @click="handleChangePage(pageNumber - 1)"
-          >
-            Trước
-          </button>
-          <div class="pagination">
+          ></button>
+          <!-- <div class="pagination">
             <div
               class="btn-pagination"
               v-for="(item, index) in totalPages"
@@ -150,15 +162,13 @@
             >
               {{ item }}
             </div>
-          </div>
-
+          </div> -->
           <button
-            class="btn btn-next"
-            v-bind:disabled="pageNumber == totalPages ? !disableButtonNext : disableButtonNext"
+            class="btn-icon"
+            v-bind:class="pageNumber == totalPages ? 'btn-next-disable' : 'btn-next-active'"
+            v-bind:disabled="pageNumber == totalPages ? true : false"
             @click="handleChangePage(pageNumber + 1)"
-          >
-            Sau
-          </button>
+          ></button>
         </div>
       </div>
     </div>
@@ -168,26 +178,24 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
-import TheButton from '../base/TheButton.vue';
+//import TheButton from '../base/TheButton.vue';
 import { selectPageSize } from '../../i18n/i18nCommon';
 import { headerTableName } from '../../i18n/i18nCommon';
 import { customizeDateTime } from '@/js/funtions/convertDateTime';
 
 const showSelectPageSize = ref(false);
 const showSelectContextMenu = ref();
-const pageSize = ref(20);
+const pageSize = ref(25);
 const pageNumber = ref(1);
 const totalRecords = ref(0);
 const totalPages = ref(0);
 const keyword = ref('');
-const disableButtonPrev = ref(true);
-const disableButtonNext = ref(false);
 const selectedEmpolyee = ref([]);
 
 const store = useStore();
 
 const refreshEmployeesList = () => {
-  pageSize.value = 20;
+  pageSize.value = 25;
   pageNumber.value = 1;
   keyword.value = '';
   getEmployeesByFilterAndPaging();
@@ -195,7 +203,7 @@ const refreshEmployeesList = () => {
 
 const getEmployeesByFilterAndPaging = () => {
   store
-    .dispatch('getDepartmentsByPaging', { pageSize, pageNumber, keyword })
+    .dispatch('getEmployeessByPaging', { pageSize, pageNumber, keyword })
     .then((data) => {
       totalRecords.value = data.totalRecords;
       totalPages.value = data.totalPages;
@@ -212,6 +220,8 @@ const handleOpenEmployeeForm = () => {
 };
 
 const employeesList = computed(() => store.getters.employeesList);
+const numberRecordsStart = computed(() => pageSize.value * (pageNumber.value - 1) + 1);
+const numberRecordsEnd = computed(() => employeesList.value.length + numberRecordsStart.value - 1);
 
 const isCheckItem = (el) => {
   return selectedEmpolyee.value.includes(el);
@@ -233,10 +243,6 @@ const checkSingleItem = (el) => {
   } else {
     selectedEmpolyee.value.push(el);
   }
-
-  //const b = {...a};
-  //const b = Object.assign({}, a);
-  //const b = JSON.parse(JSON.stringify(a));
 };
 
 const handleShowPageSize = () => {

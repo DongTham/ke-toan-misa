@@ -2,20 +2,86 @@
     position: sticky;
     left: 0;
     bottom: 0;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     z-index: 10;
+    display: flex;
+    height: 48px;
+    justify-content: space-between;
+    align-items: center;
+    font: 400 14px Roboto-Regular;
+    padding: 12px 16px;
+    box-sizing: border-box;
 }
 
-.main__body-footer .combobox {
-    min-width: 200px;
+.body__footer-right {
+    display: flex;
+    align-items: center;
+    gap: 0 16px;
 }
 
-.body__footer-right .btn {
+.body__footer-right .btn-icon {
+    height: 24px;
+    width: 24px;
     border: unset;
     background-color: transparent;
+    border-radius: 4px;
 }
 
-.body__footer-right .pagination {
+.body__footer-right .btn-icon:hover {
+    background-color: #ccece7;
+}
+
+.body__footer-right .select-record {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.body__footer-right .btn-selectdown {
+    background-position: -1792px -469px;
+}
+
+.select__record-data {
+    width: 76px;
+    height: 160px;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    right: 0;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    box-shadow: 0px 2px 8px 0px rgba(23, 27, 42, 0.24);
+    overflow-y: auto;
+    background-color: #ffffff;
+}
+
+.select__record-data .data-item {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    cursor: pointer;
+}
+
+.select__record-data .active-item,
+.select__record-data .data-item:hover {
+    background-color: #01a38a;
+    border-radius: 4px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.records-per-page-text {
+    margin-right: 4px;
+    color: #666666;
+}
+
+.records-per-page-number {
+    color: #1f1f1f;
+}
+
+
+/* .body__footer-right .pagination {
     display: flex;
     align-items: center;
     height: 36px;
@@ -33,11 +99,27 @@
 }
 
 .pagination .btn-pagination:hover {
-    background-color: #CCECE7;
+    background-color: #ccece7;
 }
 
 .pagination .active-item,
 .pagination .active-item:hover {
-    color: #FFFFFF;
-    background-color: #01A38A;
+    color: #ffffff;
+    background-color: #01a38a;
+} */
+
+.body__footer-right .btn-prev-active {
+    background-position: -29px -356px;
+}
+
+.body__footer-right .btn-prev-disable {
+    background-position: -29px -404px;
+}
+
+.body__footer-right .btn-next-active {
+    background-position: -76px -356px;
+}
+
+.body__footer-right .btn-next-disable {
+    background-position: -76px -404px;
 }

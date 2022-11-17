@@ -33,15 +33,6 @@
     overflow-x: hidden;
 }
 
-
-/* .minimize {
-    width: 56px;
-}
-
-.minimize .menu-button {
-    width: auto;
-} */
-
 .menu-button {
     position: relative;
     font: 500 14px Roboto-Medium;
@@ -52,26 +43,45 @@
     margin-bottom: 4px;
     border-radius: 4px;
     background-color: #004137;
-    color: #DBDEE3;
+    color: #dbdee3;
     display: flex;
     align-items: center;
-    padding: 0 0 0 12px;
+    justify-content: flex-start;
+    padding: 0;
 }
 
 .menu__button-icon {
     background-color: unset;
-    margin-right: 12px;
+    margin: 0 12px;
     height: 24px;
     width: 24px;
 }
 
 .menu-button:hover {
-    background-color: #01836F;
+    background-color: #01836f;
 }
 
+.menu-button.active,
 .menu-button:focus {
-    background-color: #34B6A2;
-    color: #FFFFFF;
+    background-color: #34b6a2;
+    color: #ffffff;
+}
+
+.sidebar-collapse {
+    width: 56px;
+}
+
+.sidebar-collapse .menu-button {
+    width: 32px;
+    justify-content: center;
+}
+
+.sidebar-collapse .menu__button-icon {
+    margin: 0;
+}
+
+.sidebar .btn-toggle {
+    background-position: -312px -33px;
 }
 
 .sidebar__menu-item .overview-icon {
@@ -86,7 +96,8 @@
     background-position: -73px -1628px;
 }
 
-.menu-button:focus>.cash-icon {
+.menu-button:focus>.cash-icon,
+.menu-button.active .cash-icon {
     background-position: -73px -1585px;
 }
 
