@@ -6,19 +6,37 @@
           <span>Nhân viên</span>
         </div>
         <div class="main__header-add">
-          <button class="btn btn-add" @click="handleOpenEmployeeForm">Thêm mới nhân viên</button>
+          <button class="btn btn-add" @click="handleAddEmployee">Thêm mới nhân viên</button>
         </div>
       </div>
     </div>
     <div class="main-body">
       <div class="main__body-function">
-        <div class="function-left">
-          <button class="btn batch-operation">
+        <div class="function-left" v-click-outside="handleHiddenActionMultiple">
+          <button class="btn batch-operation" @click.stop="handleShowActionMultiple">
             <div class="button-text align-center">
               <span>Thực hiện hàng loạt</span>
-              <div class="btn-icon btn-batch-operation"></div>
+              <div
+                class="btn-icon btn-batch-operation btn-icon-disable"
+                v-show="selectedEmployeeList.length == 0"
+              ></div>
+              <div
+                class="btn-icon btn-batch-operation btn-icon-enable"
+                v-show="selectedEmployeeList.length > 0"
+              ></div>
             </div>
           </button>
+          <div
+            class="combobox__data"
+            v-show="showActionMultiple && selectedEmployeeList.length > 0"
+          >
+            <div class="data-item" @click="handleDeleteMultipleEmployees">Xoá</div>
+          </div>
+          <div class="function-left__count__selected" v-if="selectedEmployeeList.length > 0">
+            <p>
+              Đã chọn: <b>{{ selectedEmployeeList.length }}</b> bản ghi
+            </p>
+          </div>
         </div>
         <div class="function-right">
           <div class="function__search">
@@ -29,11 +47,24 @@
               class="input-main"
               placeholder="Tìm theo mã, tên nhân viên"
             />
-            <button @click="getEmployeesByFilterAndPaging" class="btn-icon btn-search"></button>
+            <button @click="getEmployeesByFilterAndPaging" class="btn-icon btn-search">
+              <v-tooltip text="Tìm kiếm" activator="parent" location="bottom"></v-tooltip>
+            </button>
           </div>
-          <button class="btn-icon main__icon btn-reload" @click="refreshEmployeesList"></button>
-          <button class="btn-icon main__icon btn-export"></button>
-          <button class="btn-icon main__icon btn-filter"></button>
+
+          <button class="btn-icon main__icon btn-reload" @click="refreshEmployeesList">
+            <v-tooltip text="Load lại dữ liệu" activator="parent" location="bottom"></v-tooltip>
+          </button>
+
+          <a v-bind:href="exportToExcel"
+            ><button class="btn-icon main__icon btn-export">
+              <v-tooltip
+                text="Xuất khẩu file Excel"
+                activator="parent"
+                location="bottom"
+              ></v-tooltip></button
+          ></a>
+          <!-- <button class="btn-icon main__icon btn-filter"></button> -->
         </div>
       </div>
       <div class="main__body-table">
@@ -42,13 +73,20 @@
             <tr>
               <th class="ms-hidden"></th>
               <th class="ms-th-viewer ms-sticky">
-                <input
-                  type="checkbox"
-                  @click="checkAllItems"
-                  v-bind:checked="selectedEmpolyee.length == employeesList.length"
-                />
+                <input type="checkbox" @click="checkAllItems" v-bind:checked="isCheckedAll" />
+                <v-tooltip
+                  :text="(isCheckedAll ? 'Bỏ chọn' : 'Chọn') + ' tất cả'"
+                  activator="parent"
+                  location="bottom"
+                ></v-tooltip>
               </th>
               <th class="ms-th-viewer" v-for="(item, index) in headerTableName" :key="index">
+                <v-tooltip
+                  :disabled="item.Tooltip == ''"
+                  :text="item.Tooltip"
+                  activator="parent"
+                  location="bottom"
+                ></v-tooltip>
                 {{ item.Name }}
               </th>
               <th class="ms-th-viewer ms-sticky">Chức năng</th>
@@ -56,8 +94,13 @@
               <th class="ms-hidden"></th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="(item, index) in employeesList" :key="index" v-bind:tabindex="index">
+          <tbody v-if="employeesList.length > 0">
+            <tr
+              v-for="(item, index) in employeesList"
+              :key="index"
+              v-bind:tabindex="index"
+              @dblclick.stop="handleEditEmployee(item.EmployeeID)"
+            >
               <td class="ms-hidden"></td>
               <td class="ms-td-viewer ms-sticky">
                 <input
@@ -69,44 +112,37 @@
               <td class="ms-td-viewer">{{ item.EmployeeCode }}</td>
               <td class="ms-td-viewer">{{ item.EmployeeName }}</td>
               <td class="ms-td-viewer">
-                {{
-                  item.Gender == 0
-                    ? 'Nam'
-                    : item.Gender == 1
-                    ? 'Nữ'
-                    : item.Gender == 2
-                    ? 'Khác'
-                    : item.Gender
-                }}
+                {{ convertGenderVietNamese(item.Gender) }}
               </td>
               <td class="ms-td-viewer">{{ customizeDateTime(item.DateOfBirth) }}</td>
               <td class="ms-td-viewer">{{ item.IdentityNumber }}</td>
-              <td class="ms-td-viewer">{{ item.IdentityPlace }}</td>
+              <td class="ms-td-viewer">{{ item.IdentityIssuePlace }}</td>
               <td class="ms-td-viewer">{{ item.DepartmentName }}</td>
               <td class="ms-td-viewer">{{ item.BankAccountNumber }}</td>
               <td class="ms-td-viewer">{{ item.BankName }}</td>
               <td class="ms-td-viewer">{{ item.BankBranchName }}</td>
-              <!-- <div class="combobox__data" v-show="showSelectContextMenu == index ? true : false">
-                <div class="data-item">Nhân bản</div>
-                <div class="data-item">Xóa</div>
-                <div class="data-item">Ngừng sử dụng</div>
-              </div> -->
-
               <td class="ms-td-viewer ms-sticky td-context-menu">
-                <button class="btn-edit">Sửa</button>
-                <!-- <the-button
+                <the-button
+                  class="btn-edit"
+                  @click.stop="handleEditEmployee(item.EmployeeID)"
+                  titleHeader="Sửa"
+                ></the-button>
+                <the-button
                   class="btn-selectdown combobox__button"
-                  @click="handleSelectContextMenu(index)"
-                ></the-button> -->
-                <div
-                  @click="handleSelectContextMenu(index)"
-                  class="m-icon m-icon--dropdown"
-                  style="position: relative; border: 1px solid rgb(0, 117, 192)"
+                  @click.stop="handleShowSelectContextMenu(index)"
                 >
-                  <ul class="dropdownlist">
-                    <li class="dropdown__item">Nhân bản</li>
-                    <li class="dropdown__item">Xóa</li>
-                  </ul>
+                </the-button>
+                <div class="combobox__data" v-show="showSelectContextMenu == index ? true : false">
+                  <div class="data-item" @click="handleCloneEmployee(item.EmployeeID)">
+                    Nhân bản
+                  </div>
+                  <div
+                    class="data-item"
+                    @click="handleDeleteEmployee(item.EmployeeID, item.EmployeeCode)"
+                  >
+                    Xóa
+                  </div>
+                  <!-- <div class="data-item">Ngừng sử dụng</div> -->
                 </div>
               </td>
               <td class="ms-hidden"></td>
@@ -115,6 +151,10 @@
           </tbody>
         </table>
       </div>
+      <div class="main__body-no-data" v-show="employeesList.length == 0">
+        <p>Không có bản ghi nhân viên nào</p>
+        <button class="btn btn-add" @click="handleAddEmployee">Thêm mới nhân viên</button>
+      </div>
       <div class="main__body-footer">
         <div class="body__footer-left">
           <p>
@@ -122,12 +162,14 @@
           </p>
         </div>
         <div class="body__footer-right">
-          <div class="select-record">
+          <div class="select-record" v-click-outside="handleHiddenSelectPageSize">
             <p class="records-per-page-text">Số bản ghi/trang:</p>
             <p class="records-per-page-number">
               {{ pageSize }}
             </p>
-            <button class="btn-icon btn-selectdown" @click="handleShowPageSize"></button>
+            <button class="btn-icon btn-selectdown" @click="handleShowSelectPageSize">
+              <v-tooltip text="Chọn số bản ghi" activator="parent" location="top"></v-tooltip>
+            </button>
             <div class="select__record-data" v-show="showSelectPageSize">
               <div
                 class="data-item"
@@ -151,119 +193,232 @@
             v-bind:class="pageNumber == 1 ? 'btn-prev-disable' : 'btn-prev-active'"
             v-bind:disabled="pageNumber == 1 ? true : false"
             @click="handleChangePage(pageNumber - 1)"
-          ></button>
-          <!-- <div class="pagination">
-            <div
-              class="btn-pagination"
-              v-for="(item, index) in totalPages"
-              :key="index"
-              @click="handleChangePage(item)"
-              v-bind:class="item == pageNumber ? 'active-item' : ''"
-            >
-              {{ item }}
-            </div>
-          </div> -->
+          >
+            <v-tooltip
+              text="Trước"
+              :disabled="pageNumber == 1 ? true : false"
+              activator="parent"
+              location="top"
+            ></v-tooltip>
+          </button>
           <button
             class="btn-icon"
-            v-bind:class="pageNumber == totalPages ? 'btn-next-disable' : 'btn-next-active'"
-            v-bind:disabled="pageNumber == totalPages ? true : false"
+            v-bind:class="pageNumber >= totalPages ? 'btn-next-disable' : 'btn-next-active'"
+            v-bind:disabled="pageNumber >= totalPages ? true : false"
             @click="handleChangePage(pageNumber + 1)"
-          ></button>
+          >
+            <v-tooltip
+              :disabled="pageNumber >= totalPages ? true : false"
+              text="Sau"
+              activator="parent"
+              location="top"
+            ></v-tooltip>
+          </button>
         </div>
       </div>
     </div>
   </div>
+  <employee-dialog v-if="isShowEmployeeDialog"></employee-dialog>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
-//import TheButton from '../base/TheButton.vue';
-import { selectPageSize } from '../../i18n/i18nCommon';
-import { headerTableName } from '../../i18n/i18nCommon';
+import TheButton from '../base/TheButton.vue';
+import EmployeeDialog from '../../views/EmployeeDialog.vue';
+import { selectPageSize, headerTableName } from '../../i18n/i18nEmployeeTable';
+import { employeeDialogDetail } from '../../i18n/i18nEmployeeDialogDetail';
 import { customizeDateTime } from '@/js/funtions/convertDateTime';
+import { convertGenderVietNamese } from '@/js/funtions/convertGender';
+import { titleHeaderEmployeeForm, handleActionEmployeeForm } from '../../i18n/i18nEmployeeDetail';
+import axios from 'axios';
 
 const showSelectPageSize = ref(false);
 const showSelectContextMenu = ref();
-const pageSize = ref(25);
-const pageNumber = ref(1);
-const totalRecords = ref(0);
-const totalPages = ref(0);
-const keyword = ref('');
-const selectedEmpolyee = ref([]);
+const showActionMultiple = ref(false);
+const isShowEmployeeDialog = computed(() => store.getters.getIsShowEmployeeDialog);
+const selectedEmployeeList = reactive([]);
+
+const exportToExcel = ref('https://localhost:7228/api/v1/Employees/exportAllRecord');
 
 const store = useStore();
 
-const refreshEmployeesList = () => {
-  pageSize.value = 25;
-  pageNumber.value = 1;
-  keyword.value = '';
-  getEmployeesByFilterAndPaging();
+const employeesList = computed(() => store.getters.getEmployeesList);
+const pageSize = computed(() => store.getters.getPageSize);
+const pageNumber = computed(() => store.getters.getPageNumber);
+const totalRecords = computed(() => store.getters.getTotalRecords);
+const totalPages = computed(() => store.getters.getTotalPages);
+const keyword = computed({
+  get() {
+    return store.getters.getKeyword;
+  },
+  set(el) {
+    store.commit('updateKeyword', el);
+  },
+});
+
+const numberRecordsStart = computed(() => pageSize.value * (pageNumber.value - 1) + 1);
+const numberRecordsEnd = computed(() => employeesList.value.length + numberRecordsStart.value - 1);
+const isCheckedAll = computed(
+  () =>
+    employeesList.value.filter((item) => !selectedEmployeeList.includes(item.EmployeeID)).length ==
+      0 && employeesList.value.length > 0,
+);
+
+const refreshEmployeesList = async () => {
+  store.commit('updateShowProgress', true);
+  store.commit('updatePageSize', 25);
+  store.commit('updatePageNumber', 1);
+  store.commit('updateKeyword', '');
+  store.commit('updateSelectedEmployeeId', '');
+
+  selectedEmployeeList.length = 0;
+  await getEmployeesByFilterAndPaging();
 };
 
-const getEmployeesByFilterAndPaging = () => {
-  store
-    .dispatch('getEmployeessByPaging', { pageSize, pageNumber, keyword })
-    .then((data) => {
-      totalRecords.value = data.totalRecords;
-      totalPages.value = data.totalPages;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+const getEmployeesByFilterAndPaging = async () => {
+  store.commit('updateShowProgress', true);
+  store.commit('updateKeyword', keyword.value);
+  await store.dispatch('getEmployeesByPaging').then(() => {
+    store.commit('updateShowProgress', false);
+  });
 };
 
 getEmployeesByFilterAndPaging();
 
 const handleOpenEmployeeForm = () => {
   store.dispatch('handleCloseOrOpenEmployeeForm', true);
+  store.commit('updateIsModified', false);
+  store.commit('updateShowProgress', false);
 };
 
-const employeesList = computed(() => store.getters.employeesList);
-const numberRecordsStart = computed(() => pageSize.value * (pageNumber.value - 1) + 1);
-const numberRecordsEnd = computed(() => employeesList.value.length + numberRecordsStart.value - 1);
-
 const isCheckItem = (el) => {
-  return selectedEmpolyee.value.includes(el);
+  return selectedEmployeeList.includes(el);
 };
 
 const checkAllItems = () => {
-  if (selectedEmpolyee.value.length == employeesList.value.length) {
-    selectedEmpolyee.value.length = 0;
+  if (isCheckedAll.value) {
+    for (let i = 0; i <= selectedEmployeeList.length - 1; i++) {
+      if (employeesList.value.some((el) => el.EmployeeID == selectedEmployeeList.at(i))) {
+        selectedEmployeeList.splice(i, 1);
+        i--;
+      }
+    }
+    isCheckedAll.value = false;
   } else {
-    selectedEmpolyee.value.length = 0;
-    employeesList.value.forEach((value) => selectedEmpolyee.value.push(value.EmployeeID));
+    employeesList.value.forEach((value) => {
+      if (!selectedEmployeeList.includes(value.EmployeeID)) {
+        selectedEmployeeList.push(value.EmployeeID);
+      }
+    });
+    isCheckedAll.value = true;
   }
 };
 
 const checkSingleItem = (el) => {
-  const index = selectedEmpolyee.value.indexOf(el);
+  const index = selectedEmployeeList.indexOf(el);
   if (index > -1) {
-    selectedEmpolyee.value.splice(index, 1);
+    selectedEmployeeList.splice(index, 1);
   } else {
-    selectedEmpolyee.value.push(el);
+    selectedEmployeeList.push(el);
   }
 };
-
-const handleShowPageSize = () => {
+const handleShowSelectPageSize = () => {
   showSelectPageSize.value = showSelectPageSize.value ? false : true;
 };
 
-const handleSelectPageSize = (el) => {
+const handleHiddenSelectPageSize = () => {
   showSelectPageSize.value = false;
-  selectedEmpolyee.value.length = 0;
-  pageSize.value = el;
+};
+
+const handleShowActionMultiple = () => {
+  if (selectedEmployeeList.length > 0) {
+    showActionMultiple.value = !showActionMultiple.value;
+  }
+};
+
+const handleHiddenActionMultiple = () => {
+  showActionMultiple.value = false;
+};
+
+const handleSelectPageSize = (el) => {
+  store.commit('updateShowProgress', true);
+  showSelectPageSize.value = false;
+  //selectedEmployeeList.length = 0;
+  store.commit('updatePageSize', el);
   getEmployeesByFilterAndPaging();
 };
 
 const handleChangePage = (el) => {
-  pageNumber.value = el;
-  selectedEmpolyee.value.length = 0;
+  store.commit('updateShowProgress', true);
+  store.commit('updatePageNumber', el);
+  //selectedEmployeeList.length = 0;
   getEmployeesByFilterAndPaging();
 };
 
-const handleSelectContextMenu = (index) => {
-  showSelectContextMenu.value = index;
+const handleShowSelectContextMenu = (index) => {
+  if (showSelectContextMenu.value == index) {
+    showSelectContextMenu.value = null;
+  } else {
+    showSelectContextMenu.value = index;
+  }
+};
+
+const handleAddEmployee = async () => {
+  store.commit('updateShowProgress', true);
+  store.commit('updateTitleHeader', titleHeaderEmployeeForm.AddNew);
+  store.commit('updateHandleAction', handleActionEmployeeForm.AddNew);
+  await store.dispatch('getMaxRecord').then((maxRecord) => {
+    let selectedEmployee = computed(() => store.getters.singleEmployee);
+    selectedEmployee.value.EmployeeCode = 'NV' + maxRecord;
+    employeesList.value.unshift(selectedEmployee.value);
+  });
+
+  await handleOpenEmployeeForm();
+};
+
+const handleEditEmployee = async (employeeId) => {
+  store.commit('updateShowProgress', true);
+  store.commit('updateTitleHeader', titleHeaderEmployeeForm.Edit);
+  store.commit('updateHandleAction', handleActionEmployeeForm.Edit);
+  await store.dispatch('getSingleEmployee', employeeId);
+  await handleOpenEmployeeForm();
+};
+
+const handleCloneEmployee = async (employeeId) => {
+  await store.dispatch('getSingleEmployee', employeeId);
+  await handleAddEmployee();
+};
+
+const handleDeleteEmployee = async (employeeId, EmployeeCode) => {
+  showSelectContextMenu.value = null;
+  const DeleteDialog = employeeDialogDetail(EmployeeCode).ConfirmDelete;
+
+  store.commit('updateContentEmployeeDialog', DeleteDialog);
+  store.commit('updateSelectedEmployeeId', employeeId);
+  store.commit('updateIsShowEmployeeDialog', true);
+
+  // try {
+  //   store.commit('updateShowProgress', true);
+  //   await axios.delete(`https://localhost:7228/api/v1/Employees/${employeeId}`);
+  //   await refreshEmployeesList();
+  //   showSelectContextMenu.value = null;
+  // } catch (error) {
+  //   console.log(error);
+  // }
+};
+
+const handleDeleteMultipleEmployees = async () => {
+  try {
+    store.commit('updateShowProgress', true);
+    await axios.post('https://localhost:7228/api/v1/Employees/deleteBatch', {
+      EmployeeIDs: selectedEmployeeList,
+    });
+    await refreshEmployeesList();
+    selectedEmployeeList.length = 0;
+  } catch (error) {
+    console.log(error);
+  }
 };
 </script>
 

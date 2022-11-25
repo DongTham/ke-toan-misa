@@ -7,6 +7,7 @@
     background-color: #ffffff;
     position: sticky;
     left: 0;
+    z-index: 10;
 }
 
 .main__body-function .function-left {
@@ -78,7 +79,32 @@
 .function-left .btn-batch-operation {
     background-color: transparent;
     right: 0;
-    background-position: -558px -357px;
     opacity: 0.5;
     margin-left: 4px;
+}
+
+.btn-batch-operation.btn-icon-disable {
+    background-position: -1750px -309px;
+}
+
+.btn-batch-operation.btn-icon-enable {
+    background-position: -558px -357px;
+}
+
+.function-left .combobox__data {
+    top: calc(100% + 4px);
+    right: 0;
+    bottom: unset;
+    width: auto;
+    z-index: 10;
+}
+
+.input-main::placeholder {
+    font: 400 14px Roboto-Regular;
+    color: #9e9e9e;
+}
+
+.function-left__count__selected {
+    margin-left: 12px;
+    font: 400 14px Roboto-Regular;
 }

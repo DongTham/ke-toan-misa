@@ -16,13 +16,15 @@
 
 .combobox__button {
     width: 36px;
-    height: 35px;
+    height: 36px;
     background-image: url(../../assets/img/Sprites.64af8f61.svg);
     background-repeat: no-repeat;
     background-position: -934px -351px;
     position: absolute;
-    right: 1px;
-    border: unset;
+    right: 0;
+    border: 1px solid #ebebeb;
+    box-sizing: border-box;
+    border-left: unset;
     border-radius: 0 3px 3px 0;
     background-color: transparent;
     cursor: pointer;
@@ -30,7 +32,7 @@
 }
 
 .combobox__button:hover {
-    background-color: #F7F7F7;
+    background-color: #f7f7f7;
 }
 
 .combobox__data {
@@ -43,7 +45,7 @@
     border-radius: 4px;
     box-shadow: 0px 4px 16px 0px #171b2a3d;
     overflow-y: auto;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
 }
 
 .combobox__data .data-item {
@@ -56,8 +58,8 @@
 
 .combobox__data .active-item,
 .combobox__data .data-item:hover {
-    background-color: #01A38A;
+    background-color: #01a38a;
     border-radius: 4px;
-    color: #FFFFFF;
+    color: #ffffff;
     font-weight: 700;
 }

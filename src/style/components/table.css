@@ -22,12 +22,13 @@ table td {
     white-space: nowrap;
     height: 48px;
     max-height: 48px;
+    min-height: 48px;
     padding: 0 16px;
 }
 
 table thead th {
     position: sticky;
-    text-align: left;
+    text-align: center;
     top: -85px;
     z-index: 5;
     background-color: #eeeeee;
@@ -103,6 +104,7 @@ tr td:nth-last-child(3) {
 tr th:nth-child(2),
 tr td:nth-child(2) {
     border-left: 1px solid #e0e0e0;
+    border-right: 2px dotted #e0e0e0;
 }
 
 tr th:nth-child(2) {
@@ -141,10 +143,11 @@ td input {
     border: 1px solid transparent;
     border-radius: 4px;
     background-position: -887px -351px;
+    margin-left: 8px;
 }
 
 .td-context-menu .combobox__button:hover {
-    background-color: transparent;
+    background-color: #99dad0;
 }
 
 .td-context-menu .combobox__button:focus {
@@ -159,58 +162,22 @@ td input {
     color: #01836f;
     cursor: pointer;
     z-index: 5;
+    outline: none;
 }
 
 tr .combobox__data {
-    position: sticky;
-    bottom: 100px;
-    right: 58px;
-    /* left: calc(100% - 320px); */
+    right: 16px;
     z-index: 999;
-    max-width: 150px;
+    width: auto;
     font: 400 14px Roboto-Regular;
 }
 
-.m-icon--dropdown {
-    background-position: -887px -350px;
-    border: 1px solid #fff;
-    width: 36px;
-    height: 36px;
+.ms-th-viewer,
+.ms-td-viewer {
+    border-left: 2px dotted #e0e0e0;
 }
 
-.m-icon--dropdown:hover {
-    background-color: #eee;
-}
-
-.m-icon {
-    font-size: 20px;
-    padding: 2px;
-}
-
-.dropdownlist {
-    display: block;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    /* bottom: 0px; */
-    /* width: 100%; */
-    min-width: 100px;
-    max-height: 200px;
-    padding: 4px 2px;
-    border-radius: var(--border-radius);
-    overflow-y: auto;
-    box-shadow: 0px 4px 16px 0px #171b2a3d;
-    background-color: #fff;
-    z-index: 999;
-}
-
-.dropdown__item {
-    list-style: none;
-    height: 36px;
-    font-size: 14px;
-    line-height: 36px;
-    color: #000;
-    cursor: pointer;
-    border-radius: var(--border-radius);
-    padding: 0 8px;
+th:nth-child(3),
+td:nth-child(3) {
+    border-left: unset;
 }

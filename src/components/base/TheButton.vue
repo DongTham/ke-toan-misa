@@ -4,6 +4,12 @@
     <span v-bind:class="buttonTitleClass">{{ titleHeader }}</span>
     <div v-bind:class="buttonIconClass"></div>
     <span v-if="!isCollapse">{{ titleExtra }}</span>
+    <v-tooltip
+      :text="Tooltip"
+      :disabled="DisableTooltip"
+      activator="parent"
+      location="bottom"
+    ></v-tooltip>
   </button>
 </template>
 
@@ -41,6 +47,13 @@ export default {
     isCollapse: {
       type: Boolean,
       default: false,
+    },
+    Tooltip: {
+      type: String,
+    },
+    DisableTooltip: {
+      type: Boolean,
+      default: true,
     },
   },
 

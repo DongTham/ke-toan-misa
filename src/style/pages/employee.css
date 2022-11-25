@@ -15,7 +15,6 @@
 
 .dialog-wrapper {
     position: absolute;
-    min-width: 50%;
 }
 
 .dialog-container {
@@ -26,6 +25,10 @@
     font: 400 14px Roboto-Regular;
     color: #1f1f1f;
     line-height: 18px;
+}
+
+.employee-form {
+    min-width: 50%;
 }
 
 
@@ -89,18 +92,30 @@
     align-items: center;
 }
 
+.dialog-content__field .combobox__data {
+    bottom: unset;
+    top: calc(100% - 20px);
+    z-index: 10;
+}
+
 .field-left {
     display: flex;
     width: 50%;
+    position: relative;
 }
 
 .field-right {
     display: flex;
     width: 50%;
+    position: relative;
 }
 
 .field-left+.field-right {
     margin-left: 24px;
+}
+
+.field-left .btn-selectdown {
+    bottom: 24px;
 }
 
 .input-date {
@@ -156,6 +171,11 @@ input[type='checkbox'] {
     border-radius: 4px;
 }
 
+.field-left:has(.select__record-input:focus)>.combobox__button {
+    border: 1px solid #50b83c;
+    border-left: unset;
+}
+
 
 /* appearance for checked radiobutton */
 
@@ -196,7 +216,12 @@ input[type='checkbox']:checked {
 }
 
 .dialog__footer .btn-add-renew {
-    background-color: #089740;
+    background-color: #01a38a;
+    color: #ffffff;
+}
+
+.dialog__footer .btn-add-renew:hover {
+    background-color: #34b6a2;
     color: #ffffff;
 }
 

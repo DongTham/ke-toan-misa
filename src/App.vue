@@ -4,26 +4,31 @@
     <div class="content">
       <the-header></the-header>
       <the-content></the-content>
-      <the-employee></the-employee>
+      <the-employee v-if="showEmployeeForm"></the-employee>
+    </div>
+    <div class="progress" v-show="showProgress">
+      <v-progress-circular
+        :indeterminate="showProgress"
+        :size="50"
+        :width="8"
+        color="teal"
+      ></v-progress-circular>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import TheHeader from './components/layout/TheHeader.vue';
 import TheSidebar from './components/layout/TheSidebar.vue';
 import TheContent from './components/layout/TheContent.vue';
 import TheEmployee from './views/TheEmployee.vue';
+import { useStore } from 'vuex';
+import { computed } from '@vue/runtime-core';
 
-export default {
-  name: 'App',
-  components: {
-    TheHeader,
-    TheSidebar,
-    TheContent,
-    TheEmployee,
-  },
-};
+const store = useStore();
+
+const showProgress = computed(() => store.getters.getShowProgress);
+const showEmployeeForm = computed(() => store.getters.showEmployeeForm);
 </script>
 
 <style>
