@@ -3,7 +3,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    margin: 20px 0 0 0;
     background-color: #ffffff;
     position: sticky;
     left: 0;
@@ -93,10 +92,14 @@
 
 .function-left .combobox__data {
     top: calc(100% + 4px);
-    right: 0;
+    right: 45%;
     bottom: unset;
     width: auto;
     z-index: 10;
+}
+
+.input-main {
+    font: 400 14px Roboto-Regular;
 }
 
 .input-main::placeholder {

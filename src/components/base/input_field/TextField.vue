@@ -15,16 +15,17 @@
     </label>
     <input
       class="field-normal"
-      :class="Class"
+      :class="{ Class, 'field-error': IsShowTooltipMsg }"
       :type="Type"
       :placeholder="PlaceHolder"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
-      :ref="focusInput"
       :max="dateMax"
+      :ref="focusInput"
+      @focus="updateFocusInput(Label)"
     />
     <v-tooltip
-      :disabled="TooltipMessage == ''"
+      :disabled="!IsShowTooltipMsg"
       :text="TooltipMessage"
       activator="parent"
       location="bottom"
@@ -34,6 +35,7 @@
 
 <script>
 // import { ref } from '@vue/reactivity';
+import { useStore } from 'vuex';
 
 export default {
   name: 'TextField',
@@ -71,11 +73,25 @@ export default {
       type: String,
       default: '',
     },
+    IsShowTooltipMsg: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['update:modelValue'],
-  setup() {},
-  mounted() {
-    this.$refs.input?.focus();
+  setup() {
+    const store = useStore();
+    const updateFocusInput = (data) => {
+      store.commit('updatePresentFocusInput', data);
+    };
+
+    return { updateFocusInput };
+  },
+  mounted() {},
+  methods: {
+    focusEmployeeCode() {
+      this.$refs.input?.focus();
+    },
   },
 };
 </script>

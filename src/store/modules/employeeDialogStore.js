@@ -1,3 +1,5 @@
+import { employeeDialogDetail } from '@/i18n/i18nEmployeeDialogDetail';
+
 const employeeDialogStore = {
     state: () => ({
         contentEmployeeDialog: {},
@@ -8,17 +10,11 @@ const employeeDialogStore = {
         getIsShowEmployeeDialog: (state) => state.isShowEmployeeDialog,
     },
     actions: {
-        // async getAllDepartments({ commit }) {
-        //     try {
-        //         const response = await axios.get('https://localhost:7228/api/v1/Departments');
-        //         commit('updateDepartmentsList', response.data);
-        //     } catch (error) {
-        //         console.log(error);
-        //     }
-        // },
-        // handleCloseOrOpenEmployeeForm({ commit }, payload) {
-        //     commit('updateShowEmployeeForm', payload);
-        // },
+        openEmployeeDialog({ commit }, payload) {
+            const employeeDialog = employeeDialogDetail(payload.Msg)[payload.Type];
+            commit('updateContentEmployeeDialog', employeeDialog);
+            commit('updateIsShowEmployeeDialog', true);
+        },
     },
     mutations: {
         updateIsShowEmployeeDialog: (state, payload) => (state.isShowEmployeeDialog = payload),

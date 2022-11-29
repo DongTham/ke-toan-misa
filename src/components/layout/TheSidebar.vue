@@ -25,6 +25,8 @@
           :buttonIconClass="'btn-icon menu__button-icon ' + item.ClassButton"
           :titleExtra="item.Title"
           :isCollapse="isCollapse"
+          :Tooltip="item.Tooltip"
+          :DisableTooltip="false"
         ></the-button>
       </div>
     </div>

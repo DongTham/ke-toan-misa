@@ -6,7 +6,7 @@
           <span>Nhân viên</span>
         </div>
         <div class="main__header-add">
-          <button class="btn btn-add" @click="handleAddEmployee">Thêm mới nhân viên</button>
+          <button class="btn btn-add" @click="openFormAddEmployee">Thêm mới nhân viên</button>
         </div>
       </div>
     </div>
@@ -42,7 +42,7 @@
           <div class="function__search">
             <input
               type="text"
-              v-model="keyword"
+              v-model="filterAndPaging.keyword"
               @keypress.enter="getEmployeesByFilterAndPaging"
               class="input-main"
               placeholder="Tìm theo mã, tên nhân viên"
@@ -53,7 +53,7 @@
           </div>
 
           <button class="btn-icon main__icon btn-reload" @click="refreshEmployeesList">
-            <v-tooltip text="Load lại dữ liệu" activator="parent" location="bottom"></v-tooltip>
+            <v-tooltip text="Tải lại dữ liệu" activator="parent" location="bottom"></v-tooltip>
           </button>
 
           <a v-bind:href="exportToExcel"
@@ -94,12 +94,12 @@
               <th class="ms-hidden"></th>
             </tr>
           </thead>
-          <tbody v-if="employeesList.length > 0">
+          <tbody v-if="employeesList.length > 0" v-click-outside="handleHiddenContextMenu">
             <tr
               v-for="(item, index) in employeesList"
               :key="index"
               v-bind:tabindex="index"
-              @dblclick.stop="handleEditEmployee(item.EmployeeID)"
+              @dblclick.stop="openFormEditEmployee(item.EmployeeID)"
             >
               <td class="ms-hidden"></td>
               <td class="ms-td-viewer ms-sticky">
@@ -124,7 +124,7 @@
               <td class="ms-td-viewer ms-sticky td-context-menu">
                 <the-button
                   class="btn-edit"
-                  @click.stop="handleEditEmployee(item.EmployeeID)"
+                  @click.stop="openFormEditEmployee(item.EmployeeID)"
                   titleHeader="Sửa"
                 ></the-button>
                 <the-button
@@ -133,7 +133,7 @@
                 >
                 </the-button>
                 <div class="combobox__data" v-show="showSelectContextMenu == index ? true : false">
-                  <div class="data-item" @click="handleCloneEmployee(item.EmployeeID)">
+                  <div class="data-item" @click="openFormCloneEmployee(item.EmployeeID)">
                     Nhân bản
                   </div>
                   <div
@@ -153,19 +153,19 @@
       </div>
       <div class="main__body-no-data" v-show="employeesList.length == 0">
         <p>Không có bản ghi nhân viên nào</p>
-        <button class="btn btn-add" @click="handleAddEmployee">Thêm mới nhân viên</button>
+        <button class="btn btn-add" @click="openFormAddEmployee">Thêm mới nhân viên</button>
       </div>
       <div class="main__body-footer">
         <div class="body__footer-left">
           <p>
-            Tổng số: <b>{{ totalRecords }}</b> bản ghi
+            Tổng số: <b>{{ filterAndPaging.totalRecords }}</b> bản ghi
           </p>
         </div>
         <div class="body__footer-right">
           <div class="select-record" v-click-outside="handleHiddenSelectPageSize">
             <p class="records-per-page-text">Số bản ghi/trang:</p>
             <p class="records-per-page-number">
-              {{ pageSize }}
+              {{ filterAndPaging.pageSize }}
             </p>
             <button class="btn-icon btn-selectdown" @click="handleShowSelectPageSize">
               <v-tooltip text="Chọn số bản ghi" activator="parent" location="top"></v-tooltip>
@@ -176,7 +176,7 @@
                 v-for="(item, index) in selectPageSize"
                 :key="index"
                 @click="handleSelectPageSize(item.Value)"
-                v-bind:class="item.Value == pageSize ? 'active-item' : ''"
+                v-bind:class="item.Value == filterAndPaging.pageSize ? 'active-item' : ''"
               >
                 {{ item.Value }}
               </div>
@@ -190,25 +190,31 @@
 
           <button
             class="btn-icon"
-            v-bind:class="pageNumber == 1 ? 'btn-prev-disable' : 'btn-prev-active'"
-            v-bind:disabled="pageNumber == 1 ? true : false"
-            @click="handleChangePage(pageNumber - 1)"
+            v-bind:class="filterAndPaging.pageNumber == 1 ? 'btn-prev-disable' : 'btn-prev-active'"
+            v-bind:disabled="filterAndPaging.pageNumber == 1 ? true : false"
+            @click="handleChangePage(filterAndPaging.pageNumber - 1)"
           >
             <v-tooltip
               text="Trước"
-              :disabled="pageNumber == 1 ? true : false"
+              :disabled="filterAndPaging.pageNumber == 1 ? true : false"
               activator="parent"
               location="top"
             ></v-tooltip>
           </button>
           <button
             class="btn-icon"
-            v-bind:class="pageNumber >= totalPages ? 'btn-next-disable' : 'btn-next-active'"
-            v-bind:disabled="pageNumber >= totalPages ? true : false"
-            @click="handleChangePage(pageNumber + 1)"
+            v-bind:class="
+              filterAndPaging.pageNumber >= filterAndPaging.totalPages
+                ? 'btn-next-disable'
+                : 'btn-next-active'
+            "
+            v-bind:disabled="
+              filterAndPaging.pageNumber >= filterAndPaging.totalPages ? true : false
+            "
+            @click="handleChangePage(filterAndPaging.pageNumber + 1)"
           >
             <v-tooltip
-              :disabled="pageNumber >= totalPages ? true : false"
+              :disabled="filterAndPaging.pageNumber >= filterAndPaging.totalPages ? true : false"
               text="Sau"
               activator="parent"
               location="top"
@@ -218,87 +224,134 @@
       </div>
     </div>
   </div>
-  <employee-dialog v-if="isShowEmployeeDialog"></employee-dialog>
+  <employee-dialog
+    v-if="isShowEmployeeDialog"
+    @refresh-event="getEmployeesByFilterAndPaging"
+    @refresh-selected-employees="refreshSelectedEmployees"
+    :selectedEmployees="selectedEmployeeList"
+  ></employee-dialog>
 </template>
 
 <script setup>
 import { computed, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 import TheButton from '../base/TheButton.vue';
-import EmployeeDialog from '../../views/EmployeeDialog.vue';
-import { selectPageSize, headerTableName } from '../../i18n/i18nEmployeeTable';
-import { employeeDialogDetail } from '../../i18n/i18nEmployeeDialogDetail';
+import EmployeeDialog from '@/views/EmployeeDialog.vue';
+import { selectPageSize, headerTableName } from '@/i18n/i18nEmployeeTable';
 import { customizeDateTime } from '@/js/funtions/convertDateTime';
 import { convertGenderVietNamese } from '@/js/funtions/convertGender';
-import { titleHeaderEmployeeForm, handleActionEmployeeForm } from '../../i18n/i18nEmployeeDetail';
-import axios from 'axios';
+import { handleActionEmployeeForm } from '@/i18n/i18nEmployeeDetail';
 
 const showSelectPageSize = ref(false);
-const showSelectContextMenu = ref();
+const showSelectContextMenu = ref(null);
 const showActionMultiple = ref(false);
-const isShowEmployeeDialog = computed(() => store.getters.getIsShowEmployeeDialog);
 const selectedEmployeeList = reactive([]);
-
 const exportToExcel = ref('https://localhost:7228/api/v1/Employees/exportAllRecord');
 
 const store = useStore();
 
 const employeesList = computed(() => store.getters.getEmployeesList);
-const pageSize = computed(() => store.getters.getPageSize);
-const pageNumber = computed(() => store.getters.getPageNumber);
-const totalRecords = computed(() => store.getters.getTotalRecords);
-const totalPages = computed(() => store.getters.getTotalPages);
-const keyword = computed({
-  get() {
-    return store.getters.getKeyword;
-  },
-  set(el) {
-    store.commit('updateKeyword', el);
-  },
-});
+const isShowEmployeeDialog = computed(() => store.getters.getIsShowEmployeeDialog);
+const filterAndPaging = computed(() => store.getters.getFilterAndPaging);
 
-const numberRecordsStart = computed(() => pageSize.value * (pageNumber.value - 1) + 1);
-const numberRecordsEnd = computed(() => employeesList.value.length + numberRecordsStart.value - 1);
+/**
+ * Tính chỉ mục bản ghi bắt đầu của trang hiện tại
+ * Author: NQDONG (10/11/2022)
+ */
+const numberRecordsStart = computed(
+  () =>
+    filterAndPaging.value.pageSize * (filterAndPaging.value.pageNumber - 1) +
+    (filterAndPaging.value.totalRecords == 0 ? 0 : 1),
+);
+
+/**
+ * Tính chỉ mục bản ghi kết thúc của trang hiện tại
+ * Author: NQDONG (10/11/2022)
+ */
+const numberRecordsEnd = computed(
+  () =>
+    employeesList.value.length +
+    numberRecordsStart.value -
+    (filterAndPaging.value.totalRecords == 0 ? 0 : 1),
+);
+
+/**
+ * Kiểm tra có phải chọn tất cả hay không
+ * Author: NQDONG (10/11/2022)
+ */
 const isCheckedAll = computed(
   () =>
     employeesList.value.filter((item) => !selectedEmployeeList.includes(item.EmployeeID)).length ==
       0 && employeesList.value.length > 0,
 );
 
-const refreshEmployeesList = async () => {
-  store.commit('updateShowProgress', true);
-  store.commit('updatePageSize', 25);
-  store.commit('updatePageNumber', 1);
-  store.commit('updateKeyword', '');
-  store.commit('updateSelectedEmployeeId', '');
-
+/**
+ * Làm mới danh sách nhân viên đã chọn
+ * Author: NQDONG (10/11/2022)
+ */
+const refreshSelectedEmployees = () => {
   selectedEmployeeList.length = 0;
+};
+
+/**
+ * Làm mới danh sách nhân viên theo bộ lọc và phân trang mặc định
+ * Author: NQDONG (10/11/2022)
+ */
+const refreshEmployeesList = async () => {
+  store.commit('updateFilterAndPaging', [
+    { pageSize: 25 },
+    { pageNumber: 1 },
+    { totalRecords: 0 },
+    { totalPages: 0 },
+    { keyword: '' },
+  ]);
+
+  refreshSelectedEmployees();
   await getEmployeesByFilterAndPaging();
 };
 
+/**
+ * Lấy danh sách nhân viên theo bộ lọc và phân trang
+ * Author: NQDONG (10/11/2022)
+ */
 const getEmployeesByFilterAndPaging = async () => {
   store.commit('updateShowProgress', true);
-  store.commit('updateKeyword', keyword.value);
-  await store.dispatch('getEmployeesByPaging').then(() => {
+
+  // Lấy danh sách nhân viên qua store
+  await store.dispatch('getEmployeesByPaging').finally(() => {
     store.commit('updateShowProgress', false);
   });
 };
 
 getEmployeesByFilterAndPaging();
 
+/**
+ * Mở form chi tiết nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const handleOpenEmployeeForm = () => {
-  store.dispatch('handleCloseOrOpenEmployeeForm', true);
+  store.commit('updateShowEmployeeForm', true);
   store.commit('updateIsModified', false);
   store.commit('updateShowProgress', false);
 };
 
+/**
+ * Kiểm tra bản ghi đã có trong danh sách đã chọn hay chưa
+ * @param {String} el ID nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const isCheckItem = (el) => {
   return selectedEmployeeList.includes(el);
 };
 
+/**
+ * Thêm/Bỏ tất cả bản ghi của trang hiện tại vào danh sách đã chọn
+ * Author: NQDONG (10/11/2022)
+ */
 const checkAllItems = () => {
   if (isCheckedAll.value) {
     for (let i = 0; i <= selectedEmployeeList.length - 1; i++) {
+      // Kiểm tra bản ghi trong danh sách đã chọn có tồn tại trong danh sách của trang hiện tại hay không
       if (employeesList.value.some((el) => el.EmployeeID == selectedEmployeeList.at(i))) {
         selectedEmployeeList.splice(i, 1);
         i--;
@@ -307,6 +360,7 @@ const checkAllItems = () => {
     isCheckedAll.value = false;
   } else {
     employeesList.value.forEach((value) => {
+      // Kiểm tra bản ghi danh sách của trang hiện tại  có tồn tại trong trong danh sách đã chọn hay không
       if (!selectedEmployeeList.includes(value.EmployeeID)) {
         selectedEmployeeList.push(value.EmployeeID);
       }
@@ -315,6 +369,11 @@ const checkAllItems = () => {
   }
 };
 
+/**
+ * Thêm 1 bản ghi nhân viên vào danh sách đã chọn
+ * @param {String} el ID nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const checkSingleItem = (el) => {
   const index = selectedEmployeeList.indexOf(el);
   if (index > -1) {
@@ -323,39 +382,71 @@ const checkSingleItem = (el) => {
     selectedEmployeeList.push(el);
   }
 };
+
+/**
+ * Hiện dropdown chọn bản ghi trong 1 trang
+ * Author: NQDONG (10/11/2022)
+ */
 const handleShowSelectPageSize = () => {
   showSelectPageSize.value = showSelectPageSize.value ? false : true;
 };
 
+/**
+ * Ẩn dropdown chọn bản ghi trong 1 trang
+ * Author: NQDONG (10/11/2022)
+ */
 const handleHiddenSelectPageSize = () => {
   showSelectPageSize.value = false;
 };
 
+/**
+ * Chọn số bản ghi trong 1 trang
+ * @param {Number} el Số bản ghi trong 1 trang
+ * Author: NQDONG (10/11/2022)
+ */
+const handleSelectPageSize = (el) => {
+  store.commit('updateShowProgress', true);
+  showSelectPageSize.value = false;
+  store.commit('updateFilterAndPaging', [{ pageSize: el }]);
+
+  getEmployeesByFilterAndPaging();
+};
+
+/**
+ * Hiện thao tác hàng loạt
+ * Author: NQDONG (10/11/2022)
+ */
 const handleShowActionMultiple = () => {
   if (selectedEmployeeList.length > 0) {
     showActionMultiple.value = !showActionMultiple.value;
   }
 };
 
+/**
+ * Ẩn thao tác hàng loạt
+ * Author: NQDONG (10/11/2022)
+ */
 const handleHiddenActionMultiple = () => {
   showActionMultiple.value = false;
 };
 
-const handleSelectPageSize = (el) => {
-  store.commit('updateShowProgress', true);
-  showSelectPageSize.value = false;
-  //selectedEmployeeList.length = 0;
-  store.commit('updatePageSize', el);
-  getEmployeesByFilterAndPaging();
-};
-
+/**
+ * Chuyển trang
+ * @param {Number} el Chỉ mục của trang bản ghi
+ * Author: NQDONG (10/11/2022)
+ */
 const handleChangePage = (el) => {
   store.commit('updateShowProgress', true);
-  store.commit('updatePageNumber', el);
-  //selectedEmployeeList.length = 0;
+  store.commit('updateFilterAndPaging', [{ pageNumber: el }]);
+
   getEmployeesByFilterAndPaging();
 };
 
+/**
+ * Hiện menu ở cột chức năng
+ * @param {Number} index Chỉ mục của hàng
+ * Author: NQDONG (10/11/2022)
+ */
 const handleShowSelectContextMenu = (index) => {
   if (showSelectContextMenu.value == index) {
     showSelectContextMenu.value = null;
@@ -364,61 +455,94 @@ const handleShowSelectContextMenu = (index) => {
   }
 };
 
-const handleAddEmployee = async () => {
-  store.commit('updateShowProgress', true);
-  store.commit('updateTitleHeader', titleHeaderEmployeeForm.AddNew);
-  store.commit('updateHandleAction', handleActionEmployeeForm.AddNew);
-  await store.dispatch('getMaxRecord').then((maxRecord) => {
-    let selectedEmployee = computed(() => store.getters.singleEmployee);
-    selectedEmployee.value.EmployeeCode = 'NV' + maxRecord;
-    employeesList.value.unshift(selectedEmployee.value);
-  });
-
-  await handleOpenEmployeeForm();
-};
-
-const handleEditEmployee = async (employeeId) => {
-  store.commit('updateShowProgress', true);
-  store.commit('updateTitleHeader', titleHeaderEmployeeForm.Edit);
-  store.commit('updateHandleAction', handleActionEmployeeForm.Edit);
-  await store.dispatch('getSingleEmployee', employeeId);
-  await handleOpenEmployeeForm();
-};
-
-const handleCloneEmployee = async (employeeId) => {
-  await store.dispatch('getSingleEmployee', employeeId);
-  await handleAddEmployee();
-};
-
-const handleDeleteEmployee = async (employeeId, EmployeeCode) => {
+/**
+ * Ẩn menu ở cột chức năng
+ * Author: NQDONG (10/11/2022)
+ */
+const handleHiddenContextMenu = () => {
   showSelectContextMenu.value = null;
-  const DeleteDialog = employeeDialogDetail(EmployeeCode).ConfirmDelete;
-
-  store.commit('updateContentEmployeeDialog', DeleteDialog);
-  store.commit('updateSelectedEmployeeId', employeeId);
-  store.commit('updateIsShowEmployeeDialog', true);
-
-  // try {
-  //   store.commit('updateShowProgress', true);
-  //   await axios.delete(`https://localhost:7228/api/v1/Employees/${employeeId}`);
-  //   await refreshEmployeesList();
-  //   showSelectContextMenu.value = null;
-  // } catch (error) {
-  //   console.log(error);
-  // }
 };
 
-const handleDeleteMultipleEmployees = async () => {
-  try {
-    store.commit('updateShowProgress', true);
-    await axios.post('https://localhost:7228/api/v1/Employees/deleteBatch', {
-      EmployeeIDs: selectedEmployeeList,
-    });
-    await refreshEmployeesList();
-    selectedEmployeeList.length = 0;
-  } catch (error) {
-    console.log(error);
-  }
+/**
+ * Cập nhật loại thao tác và lấy mã lớn nhất
+ * Author: NQDONG (10/11/2022)
+ */
+const renewEmployeeCode = async () => {
+  store.commit('updateTitleHeader', handleActionEmployeeForm.AddNew.Title);
+  store.commit('updateHandleAction', handleActionEmployeeForm.AddNew.Action);
+
+  // Lấy mã lớn nhất từ store
+  await store.dispatch('getMaxRecord').then((maxRecord) => {
+    let selectedEmployee = store.getters.singleEmployee;
+    selectedEmployee.EmployeeCode = 'NV' + maxRecord;
+
+    // Đưa nhân viên đang chọn lên đầu danh sách nhân viên
+    employeesList.value.unshift(selectedEmployee);
+  });
+};
+
+/**
+ * Mở form thêm mới nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
+const openFormAddEmployee = async () => {
+  store.commit('updateShowProgress', true);
+  await renewEmployeeCode();
+  handleOpenEmployeeForm();
+};
+
+/**
+ * Mở form nhân bản nhân viên
+ * @param {String} employeeId ID nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
+const openFormCloneEmployee = async (employeeId) => {
+  store.commit('updateShowProgress', true);
+
+  // Lấy thông tin 1 nhân viên theo ID qua store
+  await store.dispatch('getSingleEmployee', employeeId);
+
+  await renewEmployeeCode();
+  handleOpenEmployeeForm();
+};
+
+/**
+ * Mở form sửa nhân viên
+ * @param {String} employeeId ID nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
+const openFormEditEmployee = async (employeeId) => {
+  store.commit('updateShowProgress', true);
+  store.commit('updateTitleHeader', handleActionEmployeeForm.Edit.Title);
+  store.commit('updateHandleAction', handleActionEmployeeForm.Edit.Action);
+
+  // Lấy thông tin 1 nhân viên theo ID qua store
+  await store.dispatch('getSingleEmployee', employeeId);
+
+  handleOpenEmployeeForm();
+};
+
+/**
+ * Xóa 1 nhân viên
+ * @param {String} employeeId ID nhân viên
+ * @param {String} employeeCode Mã nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
+const handleDeleteEmployee = (employeeId, employeeCode) => {
+  // Cập nhật giá trị selectedEmployeeId qua store
+  store.commit('updateSelectedEmployeeId', employeeId);
+
+  // Mở dialog xác nhận qua store
+  store.dispatch('openEmployeeDialog', { Msg: { Code: employeeCode }, Type: 'ConfirmDelete' });
+};
+
+/**
+ * Xóa nhiều nhân viên đã chọn
+ * Author: NQDONG (10/11/2022)
+ */
+const handleDeleteMultipleEmployees = () => {
+  // Mở dialog xác nhận qua store
+  store.dispatch('openEmployeeDialog', { Type: 'ConfirmDeleteMultiple' });
 };
 </script>
 

@@ -70,12 +70,11 @@ input:hover~.btn-search {
 
 input.field-error {
     border-color: #e61d1d;
-    margin-bottom: 8px;
 }
 
 .field-error:focus {
     outline: none;
-    border-color: #6500ff;
+    border-color: #e61d1d;
 }
 
 .field p {
@@ -119,4 +118,15 @@ input.field-verify {
 
 .btn-search:focus {
     background-color: #ebebeb;
+}
+
+div:has(.field-normal:focus)>.btn-selectdown:hover {
+    border: 1px solid #50b83c;
+    border-left: 1px solid transparent;
+}
+
+div:has(.field-error)>.btn-selectdown:hover,
+div:has(.field-error:focus)>.btn-selectdown:hover {
+    border: 1px solid #e61d1d;
+    border-left: 1px solid transparent;
 }

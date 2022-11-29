@@ -10,6 +10,11 @@
     padding: 24px;
     z-index: 999;
     max-width: 500px;
+    min-width: 400px;
+}
+
+.dialog-confirm {
+    z-index: 999 !important;
 }
 
 
@@ -54,6 +59,10 @@
     width: 100%;
 }
 
+.employee-dialog__content p~p {
+    padding-top: 8px;
+}
+
 .dialog-content__icon {
     background-image: url(../../assets/img/Sprites.64af8f61.svg);
     height: 40px;
@@ -66,6 +75,14 @@
 
 .warning-icon {
     background-position: -598px -463px;
+}
+
+.confirm-icon {
+    background-position: -832px -462px;
+}
+
+.error-icon {
+    background-position: -752px -462px;
 }
 
 
@@ -102,4 +119,21 @@
 
 .footer-right button+button {
     margin-left: 8px;
+}
+
+.single-button {
+    justify-content: center;
+}
+
+.footer-end {
+    justify-content: end;
+}
+
+.single-button .btn-cancel {
+    background-color: #01a38a;
+    color: #ffffff;
+}
+
+.single-button .btn-cancel:hover {
+    background-color: #34b6a2;
 }

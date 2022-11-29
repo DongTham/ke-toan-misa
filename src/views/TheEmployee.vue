@@ -16,6 +16,7 @@
           </div>
           <the-button
             @click="handleCloseEmployeeForm"
+            type="button"
             class="dialog-header__button"
             buttonIconClass="btn-icon btn-close"
           ></the-button>
@@ -24,16 +25,21 @@
           <div class="dialog-content__field">
             <div class="field-left">
               <text-field
+                ref="inputFieldRef"
                 :Label="titleEmployeeDetails.EmployeeCode"
-                IsValidate="true"
+                :IsValidate="true"
                 style="width: 65%"
                 v-model="singleEmployee.EmployeeCode"
                 focusInput="input"
+                :TooltipMessage="employeeDetailError.EmployeeCode.Title"
+                :IsShowTooltipMsg="employeeDetailError.EmployeeCode.IsShow"
               ></text-field>
               <text-field
                 :Label="titleEmployeeDetails.EmployeeName"
-                IsValidate="true"
+                :IsValidate="true"
                 v-model="singleEmployee.EmployeeName"
+                :TooltipMessage="employeeDetailError.EmployeeName.Title"
+                :IsShowTooltipMsg="employeeDetailError.EmployeeName.IsShow"
               ></text-field>
             </div>
             <div class="field-right">
@@ -43,6 +49,8 @@
                 Type="date"
                 v-model="singleEmployee.DateOfBirth"
                 :dateMax="dateMax"
+                :TooltipMessage="employeeDetailError.DateOfBirth.Title"
+                :IsShowTooltipMsg="employeeDetailError.DateOfBirth.IsShow"
               ></text-field>
               <div class="content-checkbox">
                 <label>{{ titleEmployeeDetails.Gender }}</label>
@@ -69,9 +77,11 @@
             <div class="field-left" v-click-outside="handleHiddenDepartmentList">
               <text-field
                 :Label="titleEmployeeDetails.Department"
-                IsValidate="true"
+                :IsValidate="true"
                 Class="input-main combobox__input select__record-input"
                 v-model="singleEmployee.DepartmentName"
+                :TooltipMessage="employeeDetailError.DepartmentName.Title"
+                :IsShowTooltipMsg="employeeDetailError.DepartmentName.IsShow"
               ></text-field>
               <button
                 type="button"
@@ -104,6 +114,8 @@
                 Type="date"
                 v-model="singleEmployee.IdentityIssueDate"
                 :dateMax="dateMax"
+                :TooltipMessage="employeeDetailError.IdentityIssueDate.Title"
+                :IsShowTooltipMsg="employeeDetailError.IdentityIssueDate.IsShow"
               ></text-field>
             </div>
           </div>
@@ -144,6 +156,8 @@
             <text-field
               :Label="titleEmployeeDetails.Email"
               v-model="singleEmployee.Email"
+              :TooltipMessage="employeeDetailError.Email.Title"
+              :IsShowTooltipMsg="employeeDetailError.Email.IsShow"
             ></text-field>
           </div>
           <div class="dialog-content__field" style="width: 75%">
@@ -165,6 +179,7 @@
           <the-button
             class="btn btn-cancel"
             titleExtra="Hủy"
+            type="button"
             @click="handleCloseEmployeeForm"
           ></the-button>
           <div class="footer-right">
@@ -192,15 +207,27 @@ import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
 
 import { useStore } from 'vuex';
-import { computed, ref, watch } from 'vue';
-import { titleEmployeeDetails } from '@/i18n/i18nEmployeeDetail';
+import { computed, onMounted, ref, watch } from 'vue';
+import { titleEmployeeDetails, handleActionEmployeeForm } from '@/i18n/i18nEmployeeDetail';
 import { customizeDateTime } from '@/js/funtions/convertDateTime';
+import { employeeDialogDetail } from '@/i18n/i18nEmployeeDialogDetail';
+import { employeeDetailErrors } from '@/i18n/i18nEmployeeDetailError';
 import { genderList } from '@/i18n/i18nGender';
+import {
+  validateCode,
+  validateName,
+  validateDepartment,
+  validateDateOfBirth,
+  validateIdentityIssueDate,
+  validateEmail,
+} from '@/js/funtions/validateEmployeeDetail';
 import axios from 'axios';
 
 // import TheDropDown from '@/components/base/TheDropDown.vue';
 
 const isShowSelectDepartment = ref(false);
+const employeeDetailError = ref(employeeDetailErrors());
+const inputFieldRef = ref();
 
 const dateMax = computed(() => customizeDateTime(Date.now(), 'YYYY-MM-DD'));
 const store = useStore();
@@ -213,71 +240,118 @@ const departmentsList = computed(() => store.getters.departmentsList);
 const titleHeader = computed(() => store.getters.getTitleHeader);
 const actionEmployeeForm = computed(() => store.getters.getHandleAction);
 const isModified = computed(() => store.getters.getIsModified);
+const presentFocusInput = computed(() => store.getters.getPresentFocusInput);
 
-watch(
-  () => store.getters.singleEmployee,
-  () => {
-    console.log(isModified.value);
-    if (!isModified.value) {
-      store.commit('updateIsModified', true);
-    }
-  },
-  { deep: true },
-);
+onMounted(() => {
+  watch(
+    () => computed(() => store.getters.singleEmployee),
+    () => {
+      if (!isModified.value) {
+        store.commit('updateIsModified', true);
+      }
+
+      validateEmployeeCode();
+      validateEmployeeName();
+      validateDepartmentName();
+      validateEmployeeDateOfBirth();
+      validateEmployeeIdentityIssueDate();
+      validateEmployeeEmail();
+    },
+    { deep: true },
+  );
+
+  inputFieldRef.value.focusEmployeeCode();
+});
 
 const checkDuplicateEmployeeCode = async () => {
-  const res = await axios.get(
-    `https://localhost:7228/api/v1/Employees/checkDuplicateCode?employeeCode=${singleEmployee.value.EmployeeCode}`,
-  );
-  return res.data.IsDuplicateEmployeeCode;
+  let urlCheckDuplicate = `https://localhost:7228/api/v1/Employees/checkDuplicateCode?recordCode=${singleEmployee.value.EmployeeCode}`;
+  if (actionEmployeeForm.value == handleActionEmployeeForm.Edit.Action) {
+    urlCheckDuplicate += `&recordID=${singleEmployee.value.EmployeeID}`;
+  }
+
+  const res = await axios.get(urlCheckDuplicate);
+  return res.data.IsDuplicateCode;
 };
 
 const handleAddNewEmployeeAndRenewForm = async () => {
   try {
     store.commit('updateShowProgress', true);
+    employeeDetailError.value.Other.IsShow = false;
+    validateEmployee();
 
-    if (actionEmployeeForm.value == 0) {
-      store.commit('updatePageNumber', 1);
-      store.commit('updateKeyword', '');
-      await axios
-        .post('https://localhost:7228/api/v1/Employees', singleEmployee.value)
-        .then((data) => {
-          store.commit('updateSelectedEmployeeId', data.data.EmployeeID);
+    let errorList = Object.values(employeeDetailError.value);
+    if (errorList.some((el) => el.IsShow)) {
+      const errorDialog = employeeDialogDetail({
+        Field: errorList.filter((el) => el.IsShow).map((el) => el.Title),
+      }).ErrorValidate;
+      store.commit('updateContentEmployeeDialog', errorDialog);
+      store.commit('updateIsShowEmployeeDialog', true);
+    } else {
+      const isDuplicateEmployeeCode = await checkDuplicateEmployeeCode();
+      if (!isDuplicateEmployeeCode) {
+        if (actionEmployeeForm.value == handleActionEmployeeForm.AddNew.Action) {
+          store.commit('updateFilterAndPaging', [{ pageNumber: 1 }, { keyword: '' }]);
+          await axios
+            .post('https://localhost:7228/api/v1/Employees', singleEmployee.value)
+            .then((data) => {
+              store.commit('updateSelectedEmployeeId', data.data.EmployeeID);
+            });
+        } else if (actionEmployeeForm.value == handleActionEmployeeForm.Edit.Action) {
+          await axios.put(
+            `https://localhost:7228/api/v1/Employees/${singleEmployee.value.EmployeeID}`,
+            singleEmployee.value,
+          );
+        }
+
+        store.dispatch('getMaxRecord').then((maxRecord) => {
+          inputFieldRef.value.focusEmployeeCode();
+          store.commit('updateSingleEmployee', { EmployeeCode: 'NV' + maxRecord });
         });
-    } else if (actionEmployeeForm.value == 1) {
-      await axios.put(
-        `https://localhost:7228/api/v1/Employees/${singleEmployee.value.EmployeeID}`,
-        singleEmployee.value,
-      );
-    }
 
-    await store.dispatch('getMaxRecord').then((maxRecord) => {
-      store.commit('updateSingleEmployee', { EmployeeCode: 'NV' + maxRecord });
-    });
+        store.commit('updateIsModified', false);
+      } else {
+        const WarningDialog = employeeDialogDetail({
+          Code: singleEmployee.value.EmployeeCode,
+        }).DuplicateEmployeeCode;
+        let dataResult = validateCode('Duplicate');
+
+        employeeDetailError.value.EmployeeCode.IsShow = dataResult.IsShow;
+        employeeDetailError.value.EmployeeCode.Title = dataResult.Title;
+        store.commit('updateContentEmployeeDialog', WarningDialog);
+        store.commit('updateIsShowEmployeeDialog', true);
+      }
+    }
   } catch (error) {
-    console.log(error);
+    let userMsg = error.response.data.UserMsg;
+    const errorDialog = employeeDialogDetail({
+      Msg: userMsg == null ? [employeeDetailError.value.Other.Title] : [userMsg],
+    }).ErrorPostData;
+    store.commit('updateContentEmployeeDialog', errorDialog);
+    store.commit('updateIsShowEmployeeDialog', true);
+    employeeDetailError.value.Other.IsShow = true;
   }
 
   store.commit('updateShowProgress', false);
 };
 
 const handleCloseEmployeeForm = async () => {
-  store.dispatch('handleCloseOrOpenEmployeeForm', false);
-  //store.commit('updateShowProgress', true);
-  store.commit('updateSingleEmployee', {});
-  store.commit('updateIsModified', false);
+  if (isModified.value) {
+    const ConfirmDialog = employeeDialogDetail().ModifiedEmployee;
+    store.commit('updateContentEmployeeDialog', ConfirmDialog);
+    store.commit('updateIsShowEmployeeDialog', true);
+  } else {
+    store.commit('updateShowEmployeeForm', false);
+    store.commit('updateSingleEmployee', {});
+    store.commit('updateIsModified', false);
 
-  //await store.dispatch('getEmployeesByPaging').then(store.commit('updateShowProgress', false));
-  await store.dispatch('getEmployeesByPaging');
+    await store.dispatch('getEmployeesByPaging').finally(store.commit('updateShowProgress', false));
+  }
 };
 
 const handleAddNewEmployee = async () => {
-  const isDuplicateEmployeeCode = await checkDuplicateEmployeeCode();
-  if (!isDuplicateEmployeeCode) {
-    await handleAddNewEmployeeAndRenewForm();
+  await handleAddNewEmployeeAndRenewForm();
+  if (!Object.values(employeeDetailError.value).some((el) => el.IsShow)) {
     await handleCloseEmployeeForm();
-  } else {
-    alert('Mã bị trùng!');
   }
 };
 
@@ -289,10 +363,74 @@ const handleSelectDepartment = (el) => {
   singleEmployee.value.DepartmentName = el.DepartmentName;
   singleEmployee.value.DepartmentID = el.DepartmentID;
   isShowSelectDepartment.value = false;
+  employeeDetailError.value.DepartmentName.IsShow = false;
 };
 
 const handleHiddenDepartmentList = () => {
   isShowSelectDepartment.value = false;
+};
+
+const validateEmployee = () => {
+  employeeDetailError.value.EmployeeCode.IsShow = validateCode(
+    singleEmployee.value.EmployeeCode,
+  ).IsShow;
+
+  employeeDetailError.value.EmployeeName.IsShow = validateName(singleEmployee.value.EmployeeName);
+  employeeDetailError.value.DepartmentName.IsShow = validateDepartment(
+    singleEmployee.value.DepartmentName,
+    departmentsList.value,
+  ).IsShow;
+  employeeDetailError.value.DateOfBirth.IsShow = validateDateOfBirth(
+    singleEmployee.value.DateOfBirth,
+  );
+  employeeDetailError.value.IdentityIssueDate.IsShow = validateIdentityIssueDate(
+    singleEmployee.value.IdentityIssueDate,
+  );
+  employeeDetailError.value.Email.IsShow = validateEmail(singleEmployee.value.Email);
+};
+
+const validateEmployeeCode = () => {
+  if (presentFocusInput.value == titleEmployeeDetails.EmployeeCode) {
+    let dataResult = validateCode(singleEmployee.value.EmployeeCode);
+    employeeDetailError.value.EmployeeCode.Title = dataResult.Title;
+    employeeDetailError.value.EmployeeCode.IsShow = dataResult.IsShow;
+  }
+};
+
+const validateEmployeeName = () => {
+  if (presentFocusInput.value == titleEmployeeDetails.EmployeeName) {
+    employeeDetailError.value.EmployeeName.IsShow = validateName(singleEmployee.value.EmployeeName);
+  }
+};
+
+const validateDepartmentName = () => {
+  if (presentFocusInput.value == titleEmployeeDetails.Department) {
+    let dataResult = validateDepartment(singleEmployee.value.DepartmentName, departmentsList.value);
+    employeeDetailError.value.DepartmentName.Title = dataResult.Title;
+    employeeDetailError.value.DepartmentName.IsShow = dataResult.IsShow;
+  }
+};
+
+const validateEmployeeDateOfBirth = () => {
+  if (presentFocusInput.value == titleEmployeeDetails.DateOfBirth) {
+    employeeDetailError.value.DateOfBirth.IsShow = validateDateOfBirth(
+      singleEmployee.value.DateOfBirth,
+    );
+  }
+};
+
+const validateEmployeeIdentityIssueDate = () => {
+  if (presentFocusInput.value == titleEmployeeDetails.IdentityIssueDate) {
+    employeeDetailError.value.IdentityIssueDate.IsShow = validateIdentityIssueDate(
+      singleEmployee.value.IdentityIssueDate,
+    );
+  }
+};
+
+const validateEmployeeEmail = () => {
+  if (presentFocusInput.value == titleEmployeeDetails.Email) {
+    employeeDetailError.value.Email.IsShow = validateEmail(singleEmployee.value.Email);
+  }
 };
 </script>
 

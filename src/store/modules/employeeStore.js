@@ -9,6 +9,7 @@ const employeeStore = {
         titleHeader: '',
         handleAction: '',
         isModified: false,
+        presentFocusInput: '',
     }),
     getters: {
         showEmployeeForm: (state) => state.showEmployeeForm,
@@ -17,6 +18,7 @@ const employeeStore = {
         getTitleHeader: (state) => state.titleHeader,
         getHandleAction: (state) => state.handleAction,
         getIsModified: (state) => state.isModified,
+        getPresentFocusInput: (state) => state.presentFocusInput,
     },
     actions: {
         async getAllDepartments({ commit }) {
@@ -26,9 +28,6 @@ const employeeStore = {
             } catch (error) {
                 console.log(error);
             }
-        },
-        handleCloseOrOpenEmployeeForm({ commit }, payload) {
-            commit('updateShowEmployeeForm', payload);
         },
 
         async getSingleEmployee({ commit }, employeeId) {
@@ -66,6 +65,7 @@ const employeeStore = {
         updateTitleHeader: (state, payload) => (state.titleHeader = payload),
         updateHandleAction: (state, payload) => (state.handleAction = payload),
         updateIsModified: (state, payload) => (state.isModified = payload),
+        updatePresentFocusInput: (state, payload) => (state.presentFocusInput = payload),
     },
 };
 

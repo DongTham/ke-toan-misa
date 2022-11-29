@@ -22,7 +22,7 @@
     background-position: -934px -351px;
     position: absolute;
     right: 0;
-    border: 1px solid #ebebeb;
+    /* border: 1px solid #ebebeb; */
     box-sizing: border-box;
     border-left: unset;
     border-radius: 0 3px 3px 0;
@@ -62,4 +62,13 @@
     border-radius: 4px;
     color: #ffffff;
     font-weight: 700;
+}
+
+.btn-selectdown {
+    border: 1px solid transparent;
+}
+
+.btn-selectdown:hover {
+    border: 1px solid #ebebeb;
+    border-left: 1px solid transparent;
 }

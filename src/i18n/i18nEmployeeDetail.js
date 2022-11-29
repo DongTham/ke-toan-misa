@@ -17,16 +17,10 @@ const titleEmployeeDetails = {
     BankBranchName: 'Chi nhánh',
 };
 
-const titleHeaderEmployeeForm = {
-    AddNew: 'THÊM MỚI NHÂN VIÊN',
-    Edit: 'THÔNG TIN NHÂN VIÊN',
-};
-
 const handleActionEmployeeForm = {
-    AddNew: 0,
-    Edit: 1,
+    AddNew: { Title: 'THÊM MỚI NHÂN VIÊN', Action: 'Thêm' },
+    Edit: { Title: 'THÔNG TIN NHÂN VIÊN', Action: 'Sửa' },
 };
 
 export { titleEmployeeDetails };
-export { titleHeaderEmployeeForm };
 export { handleActionEmployeeForm };

@@ -6,40 +6,38 @@ const contentStore = {
         isCollapse: false,
         selectedEmployeeId: '',
         showProgress: true,
-        pageSize: 25,
-        pageNumber: 1,
-        totalRecords: 0,
-        totalPages: 0,
-        keyword: '',
-        sort: 'EmployeeCode',
+        filterAndPaging: {
+            pageSize: 25,
+            pageNumber: 1,
+            totalRecords: 0,
+            totalPages: 0,
+            keyword: '',
+            sort: 'EmployeeCode',
+        },
     }),
     getters: {
         getEmployeesList: (state) => state.employeesList,
         getIsCollapse: (state) => state.isCollapse,
         getSelectedEmployeeId: (state) => state.selectedEmployeeId,
         getShowProgress: (state) => state.showProgress,
-        getPageSize: (state) => state.pageSize,
-        getPageNumber: (state) => state.pageNumber,
-        getTotalRecords: (state) => state.totalRecords,
-        getTotalPages: (state) => state.totalPages,
-        getKeyword: (state) => state.keyword,
+        getFilterAndPaging: (state) => state.filterAndPaging,
     },
     actions: {
         async getEmployeesByPaging({ state, commit, dispatch }) {
             try {
                 const response = await axios.get(
-                    `https://localhost:7228/api/v1/Employees/filter?pageSize=${state.pageSize}&pageNumber=${state.pageNumber}&keyword=${state.keyword}&sort=${state.sort}&ids=${state.selectedEmployeeId}`,
+                    `https://localhost:7228/api/v1/Employees/filter?pageSize=${state.filterAndPaging.pageSize}&pageNumber=${state.filterAndPaging.pageNumber}&keyword=${state.filterAndPaging.keyword}&sort=${state.filterAndPaging.sort}&ids=${state.selectedEmployeeId}`,
                 );
                 return new Promise((resolve) => {
                     const data = response.data.dataResult;
                     const employeeList = data.Data;
 
-                    if (employeeList.length == 0 && state.totalPages > data.totalPages) {
-                        commit('updatePageNumber', 1);
+                    if (employeeList.length == 0 && state.filterAndPaging.totalPages > data.totalPages) {
+                        commit('updateFilterAndPaging', [{ pageNumber: 1 }]);
                         resolve(false);
                     } else {
-                        commit('updateTotalRecords', data.totalRecords);
-                        commit('updateTotalPages', data.totalPages);
+                        commit('updateFilterAndPaging', [{ totalRecords: data.totalRecords }]);
+                        commit('updateFilterAndPaging', [{ totalPages: data.totalPages }]);
                         resolve(true);
                     }
 
@@ -72,20 +70,10 @@ const contentStore = {
         updateShowProgress(state, payload) {
             state.showProgress = payload;
         },
-        updatePageSize(state, payload) {
-            state.pageSize = payload;
-        },
-        updatePageNumber(state, payload) {
-            state.pageNumber = payload;
-        },
-        updateTotalRecords(state, payload) {
-            state.totalRecords = payload;
-        },
-        updateTotalPages(state, payload) {
-            state.totalPages = payload;
-        },
-        updateKeyword(state, payload) {
-            state.keyword = payload;
+        updateFilterAndPaging(state, payload) {
+            payload.forEach((el) => {
+                state.filterAndPaging[Object.keys(el)] = el[Object.keys(el)];
+            });
         },
     },
 };
