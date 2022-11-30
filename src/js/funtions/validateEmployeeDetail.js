@@ -1,3 +1,9 @@
+/**
+ * Validate dữ liệu cho mã nhân viên
+ * @param {String} employeeCode Mã nhân viên
+ * @returns Object chứa Title và isShow
+ * Author: NQDONG (10/11/2022)
+ */
 const validateCode = (employeeCode) => {
     if (employeeCode == 'Duplicate') {
         return { Title: 'Mã bị trùng!', IsShow: true };
@@ -10,6 +16,12 @@ const validateCode = (employeeCode) => {
     }
 };
 
+/**
+ * Validate dữ liệu cho tên nhân viên
+ * @param {String} employeeName Tên nhân viên
+ * @returns true/false
+ * Author: NQDONG (10/11/2022)
+ */
 const validateName = (employeeName) => {
     if (employeeName == null) {
         return true;
@@ -22,6 +34,13 @@ const validateName = (employeeName) => {
     }
 };
 
+/**
+ * Validate dữ liệu cho tên đơn vị
+ * @param {String} departmentName Tên đơn vị
+ * @param {Array} departmentsList Danh sách đơn vị
+ * @returns Object chứa Title và isShow
+ * Author: NQDONG (10/11/2022)
+ */
 const validateDepartment = (departmentName, departmentsList) => {
     if (departmentName == null) {
         return { IsShow: true };
@@ -36,6 +55,12 @@ const validateDepartment = (departmentName, departmentsList) => {
     }
 };
 
+/**
+ * Validate dữ liệu cho ngày sinh
+ * @param {String} dateOfBirth Ngày sinh
+ * @returns true/false
+ * Author: NQDONG (10/11/2022)
+ */
 const validateDateOfBirth = (dateOfBirth) => {
     if (dateOfBirth) {
         let currentDate = new Date().getTime();
@@ -48,6 +73,12 @@ const validateDateOfBirth = (dateOfBirth) => {
     }
 };
 
+/**
+ * Validate dữ liệu cho ngày cấp
+ * @param {String} identityIssueDate Ngày cấp
+ * @returns true/fasle
+ * Author: NQDONG (10/11/2022)
+ */
 const validateIdentityIssueDate = (identityIssueDate) => {
     if (identityIssueDate) {
         let currentDate = new Date().getTime();
@@ -60,6 +91,12 @@ const validateIdentityIssueDate = (identityIssueDate) => {
     }
 };
 
+/**
+ * Validate dữ liệu cho email
+ * @param {String} employeeCode Email
+ * @returns true/false
+ * Author: NQDONG (10/11/2022)
+ */
 const validateEmail = (email) => {
     if (email) {
         if (!email.match(/^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+)@([a-zA-Z0-9-]+)((\.[a-zA-Z0-9-]{1,5})+)$/)) {

@@ -81,6 +81,12 @@ export default {
   emits: ['update:modelValue'],
   setup() {
     const store = useStore();
+
+    /**
+     * Cập nhật ô input đang focus
+     * @param {String} data Giá trị ô đang focus
+     * Author: NQDONG (10/11/2022)
+     */
     const updateFocusInput = (data) => {
       store.commit('updatePresentFocusInput', data);
     };
@@ -89,6 +95,10 @@ export default {
   },
   mounted() {},
   methods: {
+    /**
+     * Focus vào input
+     * Author: NQDONG (10/11/2022)
+     */
     focusEmployeeCode() {
       this.$refs.input?.focus();
     },

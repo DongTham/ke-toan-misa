@@ -23,6 +23,10 @@ const contentStore = {
         getFilterAndPaging: (state) => state.filterAndPaging,
     },
     actions: {
+        /**
+         * Lấy danh sách nhân viên theo bộ lọc và phân trang
+         * Author: NQDONG (10/11/2022)
+         */
         async getEmployeesByPaging({ state, commit, dispatch }) {
             try {
                 const response = await axios.get(
@@ -50,7 +54,11 @@ const contentStore = {
                     }
                 });
             } catch (error) {
-                return error;
+                if (error.response.status == 404) {
+                    commit('updateEmployeesList', []);
+                } else {
+                    return error;
+                }
             }
         },
         updateIsCollapse(context) {

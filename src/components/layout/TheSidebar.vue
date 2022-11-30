@@ -42,9 +42,14 @@ import { computed } from '@vue/runtime-core';
 
 const store = useStore();
 
+/**
+ * Thu nhỏ thanh sidebar
+ * Author: NQDONG (10/11/2022)
+ */
 const handleCollapseSidebar = () => {
   store.dispatch('updateIsCollapse');
 };
+
 const isCollapse = computed(() => store.getters.getIsCollapse);
 </script>
 

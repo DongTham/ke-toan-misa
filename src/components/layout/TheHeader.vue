@@ -53,6 +53,11 @@ import { useStore } from 'vuex';
 import { computed } from '@vue/runtime-core';
 
 const store = useStore();
+
+/**
+ * Phóng to thanh sidebar
+ * Author: NQDONG (10/11/2022)
+ */
 const handleCollapseSidebar = () => {
   store.dispatch('updateIsCollapse');
 };

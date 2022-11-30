@@ -10,6 +10,11 @@ const employeeDialogStore = {
         getIsShowEmployeeDialog: (state) => state.isShowEmployeeDialog,
     },
     actions: {
+        /**
+         * Hành động mở dialog nhân viên
+         * @param {Object} payload Object chứa thông tin thông báo và loại thông báo
+         * Author: NQDONG (10/11/2022)
+         */
         openEmployeeDialog({ commit }, payload) {
             const employeeDialog = employeeDialogDetail(payload.Msg)[payload.Type];
             commit('updateContentEmployeeDialog', employeeDialog);

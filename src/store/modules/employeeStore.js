@@ -21,6 +21,10 @@ const employeeStore = {
         getPresentFocusInput: (state) => state.presentFocusInput,
     },
     actions: {
+        /**
+         * Lấy danh sách tất cả đơn vị
+         * Author: NQDONG (10/11/2022)
+         */
         async getAllDepartments({ commit }) {
             try {
                 const response = await axios.get('https://localhost:7228/api/v1/Departments');
@@ -30,6 +34,11 @@ const employeeStore = {
             }
         },
 
+        /**
+         * Lấy thông tin 1 nhân viên theo ID
+         * @param {String} employeeId Mã nhân viên
+         * Author: NQDONG (10/11/2022)
+         */
         async getSingleEmployee({ commit }, employeeId) {
             try {
                 const response = await axios.get(`https://localhost:7228/api/v1/Employees/${employeeId}`);
@@ -40,18 +49,23 @@ const employeeStore = {
                 );
                 commit('updateSingleEmployee', response.data);
             } catch (error) {
-                console.log(error);
+                return error;
             }
         },
 
+        /**
+         * Lấy mã nhân viên lớn nhất
+         * Author: NQDONG (10/11/2022)
+         */
         async getMaxRecord() {
             try {
                 const response = await axios.get('https://localhost:7228/api/v1/Employees/maxRecord');
-                let maxRecord = response.data[0].EmployeeCode;
-                maxRecord = parseInt(maxRecord.replace('NV', '')) + 1;
-                return maxRecord;
+                let maxRecord = response.data.EmployeeCode;
+                return (maxRecord + 1).toString().padStart(5, 0);
             } catch (error) {
-                console.log(error);
+                if (error.response.status == 404) {
+                    return '00001';
+                }
             }
         },
     },

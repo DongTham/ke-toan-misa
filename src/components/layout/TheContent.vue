@@ -12,32 +12,38 @@
     </div>
     <div class="main-body">
       <div class="main__body-function">
-        <div class="function-left" v-click-outside="handleHiddenActionMultiple">
-          <button class="btn batch-operation" @click.stop="handleShowActionMultiple">
-            <div class="button-text align-center">
-              <span>Thực hiện hàng loạt</span>
-              <div
-                class="btn-icon btn-batch-operation btn-icon-disable"
-                v-show="selectedEmployeeList.length == 0"
-              ></div>
-              <div
-                class="btn-icon btn-batch-operation btn-icon-enable"
-                v-show="selectedEmployeeList.length > 0"
-              ></div>
-            </div>
-          </button>
-          <div
-            class="combobox__data"
-            v-show="showActionMultiple && selectedEmployeeList.length > 0"
-          >
-            <div class="data-item" @click="handleDeleteMultipleEmployees">Xoá</div>
-          </div>
-          <div class="function-left__count__selected" v-if="selectedEmployeeList.length > 0">
+        <div class="function-left" v-if="selectedEmployeeList.length == 0"></div>
+        <div class="function-left" v-if="selectedEmployeeList.length > 0">
+          <div class="function-left__count__selected">
             <p>
-              Đã chọn: <b>{{ selectedEmployeeList.length }}</b> bản ghi
+              Đã chọn <b>{{ selectedEmployeeList.length }}</b>
             </p>
           </div>
+          <the-button
+            class="btn button-text batch-unselect"
+            titleHeader="Bỏ chọn"
+            @click.stop="uncheckAllItems"
+          ></the-button>
+          <the-button
+            class="btn button-text batch-select"
+            titleHeader="Chọn tất cả các trang"
+            @click.stop="checkItemInAllPages"
+            v-show="selectedEmployeeList.length != totalAllEmployees"
+          ></the-button>
+          <the-button
+            class="btn btn-batch batch-delete"
+            titleHeader="Xóa tất cả"
+            @click="handleDeleteMultipleEmployees"
+          ></the-button>
+          <the-button
+            class="btn-batch batch-more"
+            buttonIconClass="btn-icon more-icon"
+            Tooltip="Thêm"
+            :DisableTooltip="false"
+            @click.stop="handleShowActionMultiple"
+          ></the-button>
         </div>
+
         <div class="function-right">
           <div class="function__search">
             <input
@@ -73,12 +79,18 @@
             <tr>
               <th class="ms-hidden"></th>
               <th class="ms-th-viewer ms-sticky">
-                <input type="checkbox" @click="checkAllItems" v-bind:checked="isCheckedAll" />
-                <v-tooltip
-                  :text="(isCheckedAll ? 'Bỏ chọn' : 'Chọn') + ' tất cả'"
-                  activator="parent"
-                  location="bottom"
-                ></v-tooltip>
+                <div class="tr-checkbox">
+                  <input
+                    type="checkbox"
+                    @click="checkAllItemsInPage"
+                    v-bind:checked="isCheckedAll"
+                  />
+                  <v-tooltip
+                    :text="(isCheckedAll ? 'Bỏ chọn' : 'Chọn') + ' tất cả'"
+                    activator="parent"
+                    location="bottom"
+                  ></v-tooltip>
+                </div>
               </th>
               <th class="ms-th-viewer" v-for="(item, index) in headerTableName" :key="index">
                 <v-tooltip
@@ -103,11 +115,13 @@
             >
               <td class="ms-hidden"></td>
               <td class="ms-td-viewer ms-sticky">
-                <input
-                  type="checkbox"
-                  @click="checkSingleItem(item.EmployeeID)"
-                  v-bind:checked="isCheckItem(item.EmployeeID)"
-                />
+                <div class="tr-checkbox">
+                  <input
+                    type="checkbox"
+                    @click="checkSingleItem(item.EmployeeID)"
+                    v-bind:checked="isCheckItem(item.EmployeeID)"
+                  />
+                </div>
               </td>
               <td class="ms-td-viewer">{{ item.EmployeeCode }}</td>
               <td class="ms-td-viewer">{{ item.EmployeeName }}</td>
@@ -229,26 +243,39 @@
     @refresh-event="getEmployeesByFilterAndPaging"
     @refresh-selected-employees="refreshSelectedEmployees"
     :selectedEmployees="selectedEmployeeList"
+    @handle-confirm="handleConfirmAciton"
   ></employee-dialog>
+  <the-employee v-if="showEmployeeForm" ref="employeeDetail"></the-employee>
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 import TheButton from '../base/TheButton.vue';
 import EmployeeDialog from '@/views/EmployeeDialog.vue';
+import TheEmployee from '@/views/TheEmployee.vue';
+
 import { selectPageSize, headerTableName } from '@/i18n/i18nEmployeeTable';
 import { customizeDateTime } from '@/js/funtions/convertDateTime';
 import { convertGenderVietNamese } from '@/js/funtions/convertGender';
 import { handleActionEmployeeForm } from '@/i18n/i18nEmployeeDetail';
+import { employeeRequest } from '@/js/utils/httpRequests';
 
 const showSelectPageSize = ref(false);
 const showSelectContextMenu = ref(null);
 const showActionMultiple = ref(false);
+const showEmployeeForm = computed(() => store.getters.showEmployeeForm);
+const totalAllEmployees = ref(0);
+const employeeDetail = ref();
 const selectedEmployeeList = reactive([]);
 const exportToExcel = ref('https://localhost:7228/api/v1/Employees/exportAllRecord');
 
 const store = useStore();
+
+onMounted(() => {
+  // Lấy danh sách nhân viên theo phân trang
+  getEmployeesByFilterAndPaging();
+});
 
 const employeesList = computed(() => store.getters.getEmployeesList);
 const isShowEmployeeDialog = computed(() => store.getters.getIsShowEmployeeDialog);
@@ -286,6 +313,14 @@ const isCheckedAll = computed(
 );
 
 /**
+ * Gọi đến method của the-employee từ employee-detail
+ * Author: NQDONG (10/11/2022)
+ */
+const handleConfirmAciton = () => {
+  employeeDetail.value.handleConfirmPostData();
+};
+
+/**
  * Làm mới danh sách nhân viên đã chọn
  * Author: NQDONG (10/11/2022)
  */
@@ -306,6 +341,8 @@ const refreshEmployeesList = async () => {
     { keyword: '' },
   ]);
 
+  store.commit('updateSelectedEmployeeId', '');
+
   refreshSelectedEmployees();
   await getEmployeesByFilterAndPaging();
 };
@@ -322,8 +359,6 @@ const getEmployeesByFilterAndPaging = async () => {
     store.commit('updateShowProgress', false);
   });
 };
-
-getEmployeesByFilterAndPaging();
 
 /**
  * Mở form chi tiết nhân viên
@@ -348,7 +383,7 @@ const isCheckItem = (el) => {
  * Thêm/Bỏ tất cả bản ghi của trang hiện tại vào danh sách đã chọn
  * Author: NQDONG (10/11/2022)
  */
-const checkAllItems = () => {
+const checkAllItemsInPage = async () => {
   if (isCheckedAll.value) {
     for (let i = 0; i <= selectedEmployeeList.length - 1; i++) {
       // Kiểm tra bản ghi trong danh sách đã chọn có tồn tại trong danh sách của trang hiện tại hay không
@@ -357,6 +392,7 @@ const checkAllItems = () => {
         i--;
       }
     }
+
     isCheckedAll.value = false;
   } else {
     employeesList.value.forEach((value) => {
@@ -365,8 +401,43 @@ const checkAllItems = () => {
         selectedEmployeeList.push(value.EmployeeID);
       }
     });
+
+    // Lấy tất cả bản ghi nhân viên
+    let response = await employeeRequest.get();
+    totalAllEmployees.value = response.data.length;
     isCheckedAll.value = true;
   }
+};
+
+/**
+ * Thêm tất cả bản ghi vào danh sách đã chọn
+ * Author: NQDONG (10/11/2022)
+ */
+const checkItemInAllPages = async () => {
+  try {
+    store.commit('updateShowProgress', true);
+    selectedEmployeeList.length = 0;
+
+    // Lấy tất cả bản ghi nhân viên
+    let response = await employeeRequest.get();
+    totalAllEmployees.value = response.data.length;
+    response.data.forEach((value) => {
+      selectedEmployeeList.push(value.EmployeeID);
+    });
+  } catch (error) {
+    let userMsg = error.response.data.UserMsg;
+    // Mở modal thông báo lỗi
+    store.dispatch('openEmployeeDialog', { Msg: [userMsg], Type: 'ErrorPostData' });
+  }
+  store.commit('updateShowProgress', false);
+};
+
+/**
+ * Xóa tất cả bản ghi khỏi danh sách đã chọn
+ * Author: NQDONG (10/11/2022)
+ */
+const uncheckAllItems = () => {
+  selectedEmployeeList.length = 0;
 };
 
 /**
@@ -423,14 +494,6 @@ const handleShowActionMultiple = () => {
 };
 
 /**
- * Ẩn thao tác hàng loạt
- * Author: NQDONG (10/11/2022)
- */
-const handleHiddenActionMultiple = () => {
-  showActionMultiple.value = false;
-};
-
-/**
  * Chuyển trang
  * @param {Number} el Chỉ mục của trang bản ghi
  * Author: NQDONG (10/11/2022)
@@ -472,13 +535,13 @@ const renewEmployeeCode = async () => {
   store.commit('updateHandleAction', handleActionEmployeeForm.AddNew.Action);
 
   // Lấy mã lớn nhất từ store
-  await store.dispatch('getMaxRecord').then((maxRecord) => {
-    let selectedEmployee = store.getters.singleEmployee;
-    selectedEmployee.EmployeeCode = 'NV' + maxRecord;
+  let maxRecord = await store.dispatch('getMaxRecord');
 
-    // Đưa nhân viên đang chọn lên đầu danh sách nhân viên
-    employeesList.value.unshift(selectedEmployee);
-  });
+  let selectedEmployee = store.getters.singleEmployee;
+  selectedEmployee.EmployeeCode = 'NV' + maxRecord;
+
+  // Đưa nhân viên đang chọn lên đầu danh sách nhân viên
+  employeesList.value.unshift(selectedEmployee);
 };
 
 /**

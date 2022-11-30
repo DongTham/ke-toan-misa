@@ -8,6 +8,8 @@
           </div>
           <the-button
             @click="handleCloseEmployeeDialog"
+            Tooltip="Đóng"
+            :DisableTooltip="false"
             type="button"
             class="dialog-header__button"
             buttonIconClass="btn-icon btn-close"
@@ -54,42 +56,69 @@
 <script setup>
 import { computed, defineEmits, defineProps } from 'vue';
 import { useStore } from 'vuex';
-import axios from 'axios';
+import { employeeRequest } from '@/js/utils/httpRequests';
 import TheButton from '@/components/base/TheButton.vue';
 
 const store = useStore();
-const emitsDialog = defineEmits(['refreshEvent', 'refreshSelectedEmployees']);
+
+// Khởi tạo Emits
+const emitsDialog = defineEmits(['refreshEvent', 'refreshSelectedEmployees', 'handleConfirm']);
+
+// Khởi tạo Props
 const propsDialog = defineProps({ selectedEmployees: Array });
 const contentEmployeeDialog = computed(() => store.getters.getContentEmployeeDialog);
 
+/**
+ * Hành động khi bấm tắt modal
+ * Author: NQDONG (10/11/2022)
+ */
 const handleCloseEmployeeDialog = () => {
-  store.commit('updateContentEmployeeDialog', {});
   store.commit('updateIsShowEmployeeDialog', false);
+  store.commit('updateContentEmployeeDialog', {});
 };
 
+/**
+ * Hành động khi bấm vào nút xác nhận trong modal
+ * Author: NQDONG (10/11/2022)
+ */
 const actionConfirmed = async () => {
   switch (contentEmployeeDialog.value.Type) {
+    // Xóa
     case 'delete':
       await handleDeleteEmployee();
       break;
+
+    // Xóa nhiều
     case 'delete-multiple':
       await handleDeleteMultipleEmployee();
+      break;
+
+    // Đã bị chỉnh sửa
+    case 'modified-employee':
+      emitsDialog('handleConfirm');
       break;
     default:
       break;
   }
 };
 
+/**
+ * Hành động khi bấm vào nút không xác nhận trong modal
+ * Author: NQDONG (10/11/2022)
+ */
 const actionUnConfirmed = async () => {
   switch (contentEmployeeDialog.value.Type) {
+    // Trường hợp form nhân viên đã bị sửa đổi
     case 'modified-employee':
       handleCloseEmployeeDialog();
+
+      // Lấy danh sách nhân viên theo bộ lọc và phân trang
       await store
         .dispatch('getEmployeesByPaging')
         .finally(
-          store.commit('updateShowEmployeeForm', false),
-          store.commit('updateSingleEmployee', {}),
+          await store.commit('updateShowEmployeeForm', false),
           store.commit('updateIsModified', false),
+          store.commit('updateSingleEmployee', {}),
         );
       break;
     default:
@@ -98,33 +127,50 @@ const actionUnConfirmed = async () => {
   }
 };
 
+/**
+ * Xóa 1 nhân viên theo ID
+ * Author: NQDONG (10/11/2022)
+ */
 const handleDeleteEmployee = async () => {
   try {
-    const employeeId = store.getters.getSelectedEmployeeId;
     store.commit('updateShowProgress', true);
-    await axios.delete(`https://localhost:7228/api/v1/Employees/${employeeId}`).then(() => {
-      emitsDialog('refreshEvent');
-      handleCloseEmployeeDialog();
-    });
+    const employeeId = store.getters.getSelectedEmployeeId;
+
+    // Thực hiện xóa 1 nhân viên qua API
+    await employeeRequest.delete(`${employeeId}`);
+
+    store.commit('updateSelectedEmployeeId', '');
+    emitsDialog('refreshEvent');
+    handleCloseEmployeeDialog();
   } catch (error) {
-    console.log(error);
+    // Mở modal thông báo lỗi
+    store.dispatch('openEmployeeDialog', {
+      Msg: { Msg: [error.response.data.UserMsg] },
+      Type: 'ErrorPostData',
+    });
   }
 };
 
+/**
+ * Xóa hàng loạt nhân viên theo danh sách ID
+ * Author: NQDONG (10/11/2022)
+ */
 const handleDeleteMultipleEmployee = async () => {
   try {
     store.commit('updateShowProgress', true);
-    await axios
-      .post('https://localhost:7228/api/v1/Employees/deleteBatch', {
-        EmployeeIDs: propsDialog.selectedEmployees,
-      })
-      .then(() => {
-        emitsDialog('refreshEvent');
-        emitsDialog('refreshSelectedEmployees');
-        handleCloseEmployeeDialog();
-      });
+
+    // Thực hiện xóa hàng loạt qua API
+    await employeeRequest.post('deleteBatch', { EmployeeIDs: propsDialog.selectedEmployees });
+
+    emitsDialog('refreshEvent');
+    emitsDialog('refreshSelectedEmployees');
+    handleCloseEmployeeDialog();
   } catch (error) {
-    console.log(error);
+    // Mở modal thông báo lỗi
+    store.dispatch('openEmployeeDialog', {
+      Msg: { Msg: [error.response.data.UserMsg] },
+      Type: 'ErrorPostData',
+    });
   }
 };
 </script>

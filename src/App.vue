@@ -4,7 +4,6 @@
     <div class="content">
       <the-header></the-header>
       <the-content></the-content>
-      <the-employee v-if="showEmployeeForm"></the-employee>
     </div>
     <div class="progress" v-show="showProgress">
       <v-progress-circular
@@ -21,14 +20,12 @@
 import TheHeader from './components/layout/TheHeader.vue';
 import TheSidebar from './components/layout/TheSidebar.vue';
 import TheContent from './components/layout/TheContent.vue';
-import TheEmployee from './views/TheEmployee.vue';
 import { useStore } from 'vuex';
 import { computed } from '@vue/runtime-core';
 
 const store = useStore();
 
 const showProgress = computed(() => store.getters.getShowProgress);
-const showEmployeeForm = computed(() => store.getters.showEmployeeForm);
 </script>
 
 <style>

@@ -124,12 +124,20 @@ tr:has(input:checked)>td.ms-td-viewer {
     background-color: #ccece7;
 }
 
-th input,
-td input {
+.tr-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    width: 100%;
+}
+
+.tr-checkbox input {
     height: 20px;
     width: 20px;
     cursor: pointer;
     outline: none;
+    border-width: 3px;
 }
 
 .td-context-menu {

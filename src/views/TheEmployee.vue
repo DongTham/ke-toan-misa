@@ -15,6 +15,8 @@
             </div>
           </div>
           <the-button
+            Tooltip="Đóng"
+            :DisableTooltip="false"
             @click="handleCloseEmployeeForm"
             type="button"
             class="dialog-header__button"
@@ -187,13 +189,13 @@
               class="btn btn-add"
               titleExtra="Cất"
               type="button"
-              @click="handleAddNewEmployee"
+              @click="handleConfirmPostData"
             ></the-button>
             <the-button
               class="btn btn-add-renew"
               titleExtra="Cất và Thêm"
               type="button"
-              @click="handleAddNewEmployeeAndRenewForm"
+              @click="handleConfirmPostDataAndRenewForm"
             ></the-button>
           </div>
         </div>
@@ -207,10 +209,10 @@ import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
 
 import { useStore } from 'vuex';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, defineExpose } from 'vue';
 import { titleEmployeeDetails, handleActionEmployeeForm } from '@/i18n/i18nEmployeeDetail';
 import { customizeDateTime } from '@/js/funtions/convertDateTime';
-import { employeeDialogDetail } from '@/i18n/i18nEmployeeDialogDetail';
+// import { employeeDialogDetail } from '@/i18n/i18nEmployeeDialogDetail';
 import { employeeDetailErrors } from '@/i18n/i18nEmployeeDetailError';
 import { genderList } from '@/i18n/i18nGender';
 import {
@@ -221,9 +223,7 @@ import {
   validateIdentityIssueDate,
   validateEmail,
 } from '@/js/funtions/validateEmployeeDetail';
-import axios from 'axios';
-
-// import TheDropDown from '@/components/base/TheDropDown.vue';
+import { employeeRequest } from '@/js/utils/httpRequests';
 
 const isShowSelectDepartment = ref(false);
 const employeeDetailError = ref(employeeDetailErrors());
@@ -232,10 +232,7 @@ const inputFieldRef = ref();
 const dateMax = computed(() => customizeDateTime(Date.now(), 'YYYY-MM-DD'));
 const store = useStore();
 
-store.dispatch('getAllDepartments');
-
 const singleEmployee = computed(() => store.getters.singleEmployee);
-
 const departmentsList = computed(() => store.getters.departmentsList);
 const titleHeader = computed(() => store.getters.getTitleHeader);
 const actionEmployeeForm = computed(() => store.getters.getHandleAction);
@@ -243,6 +240,7 @@ const isModified = computed(() => store.getters.getIsModified);
 const presentFocusInput = computed(() => store.getters.getPresentFocusInput);
 
 onMounted(() => {
+  // Validate form chi tiết nhân viên
   watch(
     () => computed(() => store.getters.singleEmployee),
     () => {
@@ -260,105 +258,176 @@ onMounted(() => {
     { deep: true },
   );
 
+  // Focus vào ô mã nhân viên
   inputFieldRef.value.focusEmployeeCode();
+
+  // Lấy danh sách tất cả đơn vị
+  store.dispatch('getAllDepartments');
 });
 
+/**
+ * Kiểm tra trùng mã nhân viên
+ * @returns Mã có bị trùng hay không
+ * Author: NQDONG (10/11/2022)
+ */
 const checkDuplicateEmployeeCode = async () => {
-  let urlCheckDuplicate = `https://localhost:7228/api/v1/Employees/checkDuplicateCode?recordCode=${singleEmployee.value.EmployeeCode}`;
+  let urlCheckDuplicate = `checkDuplicateCode?recordCode=${singleEmployee.value.EmployeeCode}`;
   if (actionEmployeeForm.value == handleActionEmployeeForm.Edit.Action) {
     urlCheckDuplicate += `&recordID=${singleEmployee.value.EmployeeID}`;
   }
 
-  const res = await axios.get(urlCheckDuplicate);
+  const res = await employeeRequest.get(urlCheckDuplicate);
   return res.data.IsDuplicateCode;
 };
 
-const handleAddNewEmployeeAndRenewForm = async () => {
+/**
+ * Thao tác gửi data qua API để thực hiện thêm mới
+ * Author: NQDONG (10/11/2022)
+ */
+const actionAddEmployee = async () => {
+  store.commit('updateFilterAndPaging', [{ pageNumber: 1 }, { keyword: '' }]);
+  await employeeRequest.post('', singleEmployee.value).then((data) => {
+    store.commit('updateSelectedEmployeeId', data.data.EmployeeID);
+  });
+};
+
+/**
+ * Thao tác gửi data qua API để thực hiện chỉnh sửa
+ * Author: NQDONG (10/11/2022)
+ */
+const actionEditEmployee = async () => {
+  await employeeRequest
+    .put(`${singleEmployee.value.EmployeeID}`, singleEmployee.value)
+    .finally(
+      store.commit('updateTitleHeader', handleActionEmployeeForm.AddNew.Title),
+      store.commit('updateHandleAction', handleActionEmployeeForm.AddNew.Action),
+    );
+};
+
+/**
+ * Thao tác thêm/sửa khi bấm vào nút cất và tạo form mới
+ * Author: NQDONG (10/11/2022)
+ */
+const getBiggestCode = async () => {
+  // Lấy mã lớn nhất từ store
+  let maxRecord = await store.dispatch('getMaxRecord');
+
+  // Focus vào ô mã nhân viên
+  inputFieldRef.value.focusEmployeeCode();
+
+  // Cập nhật lại giá trị của nhân viên đang chọn
+  await store.commit('updateSingleEmployee', { EmployeeCode: 'NV' + maxRecord });
+
+  store.commit('updateIsModified', false);
+};
+
+/**
+ * Thao tác thêm/sửa khi bấm vào nút cất và tạo form mới
+ * Author: NQDONG (10/11/2022)
+ */
+const handleConfirmPostDataAndRenewForm = async () => {
   try {
     store.commit('updateShowProgress', true);
     employeeDetailError.value.Other.IsShow = false;
     validateEmployee();
 
+    // Convert từ object sang array
     let errorList = Object.values(employeeDetailError.value);
+
+    // Kiểm tra xem có lỗi nào hay không
     if (errorList.some((el) => el.IsShow)) {
-      const errorDialog = employeeDialogDetail({
-        Field: errorList.filter((el) => el.IsShow).map((el) => el.Title),
-      }).ErrorValidate;
-      store.commit('updateContentEmployeeDialog', errorDialog);
-      store.commit('updateIsShowEmployeeDialog', true);
+      // Mở modal thông báo lỗi
+      store.dispatch('openEmployeeDialog', {
+        Msg: { Field: errorList.filter((el) => el.IsShow).map((el) => el.Title) },
+        Type: 'ErrorValidate',
+      });
     } else {
+      // Kiểm tra trùng mã nhân viên
       const isDuplicateEmployeeCode = await checkDuplicateEmployeeCode();
       if (!isDuplicateEmployeeCode) {
+        // Kiểm tra thao tác của form là tạo mới
         if (actionEmployeeForm.value == handleActionEmployeeForm.AddNew.Action) {
-          store.commit('updateFilterAndPaging', [{ pageNumber: 1 }, { keyword: '' }]);
-          await axios
-            .post('https://localhost:7228/api/v1/Employees', singleEmployee.value)
-            .then((data) => {
-              store.commit('updateSelectedEmployeeId', data.data.EmployeeID);
-            });
-        } else if (actionEmployeeForm.value == handleActionEmployeeForm.Edit.Action) {
-          await axios.put(
-            `https://localhost:7228/api/v1/Employees/${singleEmployee.value.EmployeeID}`,
-            singleEmployee.value,
-          );
+          await actionAddEmployee();
+        } // Kiểm tra thao tác của form là sửa
+        else if (actionEmployeeForm.value == handleActionEmployeeForm.Edit.Action) {
+          await actionEditEmployee();
         }
 
-        store.dispatch('getMaxRecord').then((maxRecord) => {
-          inputFieldRef.value.focusEmployeeCode();
-          store.commit('updateSingleEmployee', { EmployeeCode: 'NV' + maxRecord });
-        });
-
-        store.commit('updateIsModified', false);
+        await getBiggestCode();
       } else {
-        const WarningDialog = employeeDialogDetail({
-          Code: singleEmployee.value.EmployeeCode,
-        }).DuplicateEmployeeCode;
+        // Hiển thị tooltip lỗi trùng mã
         let dataResult = validateCode('Duplicate');
-
         employeeDetailError.value.EmployeeCode.IsShow = dataResult.IsShow;
         employeeDetailError.value.EmployeeCode.Title = dataResult.Title;
-        store.commit('updateContentEmployeeDialog', WarningDialog);
-        store.commit('updateIsShowEmployeeDialog', true);
+
+        // Mở modal thông báo lỗi
+        store.dispatch('openEmployeeDialog', {
+          Msg: { Code: singleEmployee.value.EmployeeCode },
+          Type: 'DuplicateEmployeeCode',
+        });
       }
     }
   } catch (error) {
     let userMsg = error.response.data.UserMsg;
-    const errorDialog = employeeDialogDetail({
-      Msg: userMsg == null ? [employeeDetailError.value.Other.Title] : [userMsg],
-    }).ErrorPostData;
-    store.commit('updateContentEmployeeDialog', errorDialog);
-    store.commit('updateIsShowEmployeeDialog', true);
+
+    // Mở modal thông báo lỗi
+    store.dispatch('openEmployeeDialog', {
+      Msg: { Msg: userMsg == null ? [employeeDetailError.value.Other.Title] : [userMsg] },
+      Type: 'ErrorPostData',
+    });
+
     employeeDetailError.value.Other.IsShow = true;
   }
 
   store.commit('updateShowProgress', false);
 };
 
-const handleCloseEmployeeForm = async () => {
-  if (isModified.value) {
-    const ConfirmDialog = employeeDialogDetail().ModifiedEmployee;
-    store.commit('updateContentEmployeeDialog', ConfirmDialog);
-    store.commit('updateIsShowEmployeeDialog', true);
-  } else {
-    store.commit('updateShowEmployeeForm', false);
-    store.commit('updateSingleEmployee', {});
-    store.commit('updateIsModified', false);
-
-    await store.dispatch('getEmployeesByPaging').finally(store.commit('updateShowProgress', false));
-  }
-};
-
-const handleAddNewEmployee = async () => {
-  await handleAddNewEmployeeAndRenewForm();
+/**
+ * Thao tác thêm/sửa khi bấm vào nút cất
+ * Author: NQDONG (10/11/2022)
+ */
+const handleConfirmPostData = async () => {
+  await handleConfirmPostDataAndRenewForm();
   if (!Object.values(employeeDetailError.value).some((el) => el.IsShow)) {
     await handleCloseEmployeeForm();
   }
 };
 
+/**
+ * Thao tác đóng form khi bấm vào nút hủy
+ * Author: NQDONG (10/11/2022)
+ */
+const handleCloseEmployeeForm = async () => {
+  if (isModified.value) {
+    // Mở modal xác nhận
+    store.dispatch('openEmployeeDialog', { Type: 'ModifiedEmployee' });
+  } else {
+    store.commit('updateShowEmployeeForm', false);
+
+    // Lấy danh sách nhân viên theo bộ lọc và phân trang
+    await store.dispatch('getEmployeesByPaging').finally(store.commit('updateShowProgress', false));
+
+    store.commit('updateSingleEmployee', {});
+  }
+};
+
+defineExpose({
+  handleConfirmPostData,
+});
+
+/**
+ * Hiện dropdown chọn đơn vị
+ * Author: NQDONG (10/11/2022)
+ */
 const handleShowDepartmentList = () => {
   isShowSelectDepartment.value = !isShowSelectDepartment.value;
 };
 
+/**
+ * Thao tác chọn đơn vị
+ * @param {String} el Thông tin 1 đơn vị đã chọn
+ * Author: NQDONG (10/11/2022)
+ */
 const handleSelectDepartment = (el) => {
   singleEmployee.value.DepartmentName = el.DepartmentName;
   singleEmployee.value.DepartmentID = el.DepartmentID;
@@ -366,29 +435,51 @@ const handleSelectDepartment = (el) => {
   employeeDetailError.value.DepartmentName.IsShow = false;
 };
 
+/**
+ * Ẩn dropdown chọn đơn vị
+ * Author: NQDONG (10/11/2022)
+ */
 const handleHiddenDepartmentList = () => {
   isShowSelectDepartment.value = false;
 };
 
+/**
+ * Validate chung cho form employee trước khi cất
+ * Author: NQDONG (10/11/2022)
+ */
 const validateEmployee = () => {
+  // Validate mã nhân viên
   employeeDetailError.value.EmployeeCode.IsShow = validateCode(
     singleEmployee.value.EmployeeCode,
   ).IsShow;
 
+  // Validate tên nhân viên
   employeeDetailError.value.EmployeeName.IsShow = validateName(singleEmployee.value.EmployeeName);
+
+  // Validate tên đơn vị
   employeeDetailError.value.DepartmentName.IsShow = validateDepartment(
     singleEmployee.value.DepartmentName,
     departmentsList.value,
   ).IsShow;
+
+  // Validate ngày sinh
   employeeDetailError.value.DateOfBirth.IsShow = validateDateOfBirth(
     singleEmployee.value.DateOfBirth,
   );
+
+  // Validate ngày cấp
   employeeDetailError.value.IdentityIssueDate.IsShow = validateIdentityIssueDate(
     singleEmployee.value.IdentityIssueDate,
   );
+
+  // Validate email
   employeeDetailError.value.Email.IsShow = validateEmail(singleEmployee.value.Email);
 };
 
+/**
+ * Validate trường mã nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const validateEmployeeCode = () => {
   if (presentFocusInput.value == titleEmployeeDetails.EmployeeCode) {
     let dataResult = validateCode(singleEmployee.value.EmployeeCode);
@@ -397,12 +488,20 @@ const validateEmployeeCode = () => {
   }
 };
 
+/**
+ * Validate trường tên nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const validateEmployeeName = () => {
   if (presentFocusInput.value == titleEmployeeDetails.EmployeeName) {
     employeeDetailError.value.EmployeeName.IsShow = validateName(singleEmployee.value.EmployeeName);
   }
 };
 
+/**
+ * Validate trường tên đơn vị của nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const validateDepartmentName = () => {
   if (presentFocusInput.value == titleEmployeeDetails.Department) {
     let dataResult = validateDepartment(singleEmployee.value.DepartmentName, departmentsList.value);
@@ -411,6 +510,10 @@ const validateDepartmentName = () => {
   }
 };
 
+/**
+ * Validate trường ngày sinh của nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const validateEmployeeDateOfBirth = () => {
   if (presentFocusInput.value == titleEmployeeDetails.DateOfBirth) {
     employeeDetailError.value.DateOfBirth.IsShow = validateDateOfBirth(
@@ -419,6 +522,10 @@ const validateEmployeeDateOfBirth = () => {
   }
 };
 
+/**
+ * Validate trường ngày cấp CMND của nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const validateEmployeeIdentityIssueDate = () => {
   if (presentFocusInput.value == titleEmployeeDetails.IdentityIssueDate) {
     employeeDetailError.value.IdentityIssueDate.IsShow = validateIdentityIssueDate(
@@ -427,6 +534,10 @@ const validateEmployeeIdentityIssueDate = () => {
   }
 };
 
+/**
+ * Validate trường email của nhân viên
+ * Author: NQDONG (10/11/2022)
+ */
 const validateEmployeeEmail = () => {
   if (presentFocusInput.value == titleEmployeeDetails.Email) {
     employeeDetailError.value.Email.IsShow = validateEmail(singleEmployee.value.Email);

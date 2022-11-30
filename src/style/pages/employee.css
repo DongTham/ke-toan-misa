@@ -182,7 +182,7 @@ input[type='checkbox'] {
 input[type='radio']:checked,
 input[type='checkbox']:checked {
     background-color: #089740;
-    border: 1px solid #089740;
+    border: 3px solid #089740;
 }
 
 .content-checkbox__wrapper span {
