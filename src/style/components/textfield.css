@@ -1,132 +1,136 @@
 .field {
-    display: grid;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
+  display: grid;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
 }
 
-.field+.field {
-    margin-left: 8px;
+.field + .field {
+  margin-left: 8px;
 }
 
 .field input {
-    font: 400 14px Roboto-Regular;
-    background-color: #ffffff;
-    border: 1px solid #ebebeb;
-    border-radius: 4px;
-    margin-top: 8px;
-    padding: 0 12px;
-    height: 36px;
-    min-width: 100px;
-    outline: none;
-    box-sizing: border-box;
+  font: 400 14px Roboto-Regular;
+  background-color: #ffffff;
+  border: 1px solid #ebebeb;
+  border-radius: 4px;
+  margin-top: 8px;
+  padding: 0 12px;
+  height: 36px;
+  min-width: 100px;
+}
+
+.field input[type='text'],
+.field input[type='number'] {
+  outline: none;
+  box-sizing: border-box;
 }
 
 .field input:hover,
-input:hover~.btn-check,
-input:hover~.btn-verify,
-input:hover~.btn-search {
-    background-color: #f6f6f6;
+input:hover ~ .btn-check,
+input:hover ~ .btn-verify,
+input:hover ~ .btn-search {
+  background-color: #f6f6f6;
 }
 
 .field label {
-    color: #1f1f1f;
-    font-weight: 700;
+  color: #1f1f1f;
+  font-weight: 700;
 }
 
 .field input::placeholder {
-    font: 400 14px Roboto-Regular;
-    color: #9e9e9e;
-    line-height: 18px;
+  font: 400 14px Roboto-Regular;
+  color: #9e9e9e;
+  line-height: 18px;
 }
 
 .btn-search {
-    position: absolute;
-    background-color: #ffffff;
-    color: #666666;
-    border-radius: 0 3px 3px 0;
-    font-size: 16px;
-    border: 0px solid #ebebeb;
-    z-index: 2;
-    height: 34px;
-    width: 40px;
-    padding: 0;
-    top: calc(100% - 35px);
-    right: calc(100% - 259px);
+  position: absolute;
+  background-color: #ffffff;
+  color: #666666;
+  border-radius: 0 3px 3px 0;
+  font-size: 16px;
+  border: 0px solid #ebebeb;
+  z-index: 2;
+  height: 34px;
+  width: 40px;
+  padding: 0;
+  top: calc(100% - 35px);
+  right: calc(100% - 259px);
 }
 
 .btn-search {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .field-normal:focus,
 .field-valid:focus,
 .field-verify:focus,
 .field-action-search:focus {
-    outline: none;
-    border-color: #50b83c;
+  outline: none;
+  border-color: #50b83c;
 }
 
 input.field-error {
-    border-color: #e61d1d;
+  border-color: #e61d1d;
 }
 
 .field-error:focus {
-    outline: none;
-    border-color: #e61d1d;
+  outline: none;
+  border-color: #e61d1d;
 }
 
 .field p {
-    margin: 0;
-    color: #e61d1d;
-    font-size: 12px;
+  margin: 0;
+  color: #e61d1d;
+  font-size: 12px;
 }
 
 input.field-readonly {
-    background-color: #ebebeb;
-    border-color: #e0e0e0;
-    line-height: 11px;
-    color: #666666;
+  background-color: #ebebeb;
+  border-color: #e0e0e0;
+  line-height: 11px;
+  color: #666666;
 }
 
 .field-readonly:focus {
-    outline: none;
+  outline: none;
 }
 
 input.field-valid,
 input.field-verify {
-    border-color: #50b83c;
-    color: #212121;
+  border-color: #50b83c;
+  color: #212121;
 }
 
 .btn-check,
 .btn-verify {
-    position: absolute;
-    color: #50b83c;
-    background-color: #ffffff;
-    font-size: 16px;
-    border: unset;
-    z-index: 2;
-    top: calc(100% - 28px);
-    right: calc(100% - 259px);
-    height: 20px;
-    width: 20px;
-    padding: 0;
-    margin-right: 8px;
+  position: absolute;
+  color: #50b83c;
+  background-color: #ffffff;
+  font-size: 16px;
+  border: unset;
+  z-index: 2;
+  top: calc(100% - 28px);
+  right: calc(100% - 259px);
+  height: 20px;
+  width: 20px;
+  padding: 0;
+  margin-right: 8px;
 }
 
 .btn-search:focus {
-    background-color: #ebebeb;
+  background-color: #ebebeb;
 }
 
-div:has(.field-normal:focus)>.btn-selectdown:hover {
-    border: 1px solid #50b83c;
-    border-left: 1px solid transparent;
+div:has(.field-normal:focus) > .btn-selectdown:hover {
+  border: 1px solid #50b83c;
+  border-left: 1px solid transparent;
 }
 
-div:has(.field-error)>.btn-selectdown:hover,
-div:has(.field-error:focus)>.btn-selectdown:hover {
-    border: 1px solid #e61d1d;
-    border-left: 1px solid transparent;
+div:has(.field-error) > .btn-selectdown:hover,
+div:has(.field-error:focus) > .btn-selectdown:hover {
+  border: 1px solid #e61d1d;
+  border-left: 1px solid transparent;
 }

@@ -4,27 +4,27 @@
     padding: 0 16px;
     border: unset;
     border-radius: 4px;
-    background-color: #01A38A;
+    background-color: #01a38a;
     font-size: 14px;
     font-weight: 500;
     font-family: Roboto-Medium;
-    outline: none;
+    outline: unset;
     cursor: pointer;
     box-sizing: border-box;
     align-items: center;
 }
 
 .btn:hover {
-    background-color: #34B6A2;
+    background-color: #34b6a2;
 }
 
 .btn:focus {
-    background-color: #01836F;
+    background-color: #01836f;
 }
 
 .btn-icon {
     border: unset;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     outline: none;
     cursor: pointer;
     box-sizing: border-box;

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import employeeRequests from '@/js/utils/employeeRequests';
 
 const contentStore = {
     state: () => ({
@@ -29,8 +29,12 @@ const contentStore = {
          */
         async getEmployeesByPaging({ state, commit, dispatch }) {
             try {
-                const response = await axios.get(
-                    `https://localhost:7228/api/v1/Employees/filter?pageSize=${state.filterAndPaging.pageSize}&pageNumber=${state.filterAndPaging.pageNumber}&keyword=${state.filterAndPaging.keyword}&sort=${state.filterAndPaging.sort}&ids=${state.selectedEmployeeId}`,
+                // const response = await axios.get(
+                //     `https://localhost:7228/api/v1/Employees/filter?pageSize=${state.filterAndPaging.pageSize}&pageNumber=${state.filterAndPaging.pageNumber}&keyword=${state.filterAndPaging.keyword}&sort=${state.filterAndPaging.sort}&ids=${state.selectedEmployeeId}`,
+                // );
+                const response = await employeeRequests.getByFilterAndPaging(
+                    state.filterAndPaging,
+                    state.selectedEmployeeId,
                 );
                 return new Promise((resolve) => {
                     const data = response.data.dataResult;
@@ -61,6 +65,11 @@ const contentStore = {
                 }
             }
         },
+
+        /**
+         * Cập nhật giá trị phóng to/thu nhỏ sidebar
+         * Author: NQDONG (10/11/2022)
+         */
         updateIsCollapse(context) {
             context.commit('updateIsCollapse');
         },

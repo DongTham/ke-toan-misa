@@ -14,6 +14,7 @@
       ></v-tooltip>
     </label>
     <input
+      ref="focusInput"
       class="field-normal"
       :class="{ Class, 'field-error': IsShowTooltipMsg }"
       :type="Type"
@@ -21,8 +22,8 @@
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       :max="dateMax"
-      :ref="focusInput"
       @focus="updateFocusInput(Label)"
+      :tabindex="tabIndex"
     />
     <v-tooltip
       :disabled="!IsShowTooltipMsg"
@@ -62,7 +63,6 @@ export default {
       default: '',
     },
     modelValue: {},
-    focusInput: { type: String },
     maxTimeInput: {},
     dateMax: {},
     TooltipLabel: {
@@ -76,6 +76,9 @@ export default {
     IsShowTooltipMsg: {
       type: Boolean,
       default: false,
+    },
+    tabIndex: {
+      type: Number,
     },
   },
   emits: ['update:modelValue'],
@@ -92,16 +95,6 @@ export default {
     };
 
     return { updateFocusInput };
-  },
-  mounted() {},
-  methods: {
-    /**
-     * Focus vào input
-     * Author: NQDONG (10/11/2022)
-     */
-    focusEmployeeCode() {
-      this.$refs.input?.focus();
-    },
   },
 };
 </script>

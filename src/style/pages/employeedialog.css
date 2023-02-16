@@ -1,139 +1,140 @@
 /* CSS Dialog Employee*/
 
 .employee-dialog {
-    border: unset;
-    border-radius: 4px;
-    background-color: #ffffff;
-    font: 400 14px Roboto-Regular;
-    color: #1f1f1f;
-    line-height: 18px;
-    padding: 24px;
-    z-index: 999;
-    max-width: 500px;
-    min-width: 400px;
+  border: unset;
+  border-radius: 4px;
+  background-color: #ffffff;
+  font: 400 14px Roboto-Regular;
+  color: #1f1f1f;
+  line-height: 18px;
+  padding: 24px;
+  z-index: 999;
+  max-width: 500px;
+  min-width: 400px;
 }
 
 .dialog-confirm {
-    z-index: 999 !important;
+  z-index: 999 !important;
 }
-
 
 /* CSS Dialog Header */
 
 .employee-dialog__header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .dialog-header__title {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .header-title {
-    font: 700 24px Roboto-Bold;
+  font: 700 24px Roboto-Bold;
 }
 
 .dialog-header__button {
-    position: relative;
-    background-color: transparent;
-    border: unset;
-    outline: none;
-    padding: 0;
+  position: relative;
+  background-color: transparent;
+  border: unset;
+  outline: none;
+  padding: 0;
 }
 
 .btn-close {
-    background-position: -1172px -356px;
-    height: 24px;
-    width: 24px;
+  background-position: -1172px -356px;
+  height: 24px;
+  width: 24px;
 }
-
 
 /* CSS Dialog Content */
 
 .employee-dialog__content {
-    position: relative;
-    padding: 24px 0;
-    display: flex;
-    align-items: center;
-    width: 100%;
+  position: relative;
+  padding: 24px 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
-.employee-dialog__content p~p {
-    padding-top: 8px;
+.employee-dialog__content p ~ p {
+  padding-top: 8px;
 }
 
 .dialog-content__icon {
-    background-image: url(../../assets/img/Sprites.64af8f61.svg);
-    height: 40px;
-    min-height: 40px;
-    width: 40px;
-    min-width: 40px;
-    padding: 2px;
-    margin-right: 8px;
+  background-image: url(../../assets/img/Sprites.64af8f61.svg);
+  height: 40px;
+  min-height: 40px;
+  width: 40px;
+  min-width: 40px;
+  padding: 2px;
+  margin-right: 8px;
 }
 
 .warning-icon {
-    background-position: -598px -463px;
+  background-position: -598px -463px;
 }
 
 .confirm-icon {
-    background-position: -832px -462px;
+  background-position: -832px -462px;
 }
 
 .error-icon {
-    background-position: -752px -462px;
+  background-position: -752px -462px;
 }
-
 
 /* CSS Dialog Footer */
 
 .employee-dialog__footer {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 24px;
-    display: flex;
-    justify-content: space-between;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.employee-dialog__footer button:focus {
+  outline: 1px solid #1f1f1f;
 }
 
 .employee-dialog__footer .btn-cancel,
 .employee-dialog__footer .btn-unconfirm {
-    background-color: #ffffff;
-    border-radius: 3px;
-    border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  border-radius: 3px;
+  border: 1px solid #e0e0e0;
 }
 
 .employee-dialog__footer .btn-cancel:hover,
 .employee-dialog__footer .btn-unconfirm:hover {
-    background-color: #f1f1f1;
+  background-color: #f1f1f1;
 }
 
 .employee-dialog__footer .btn-confirm {
-    background-color: #01a38a;
-    color: #ffffff;
+  background-color: #01a38a;
+  color: #ffffff;
 }
 
 .employee-dialog__footer .btn-confirm:hover {
-    background-color: #34b6a2;
-    color: #ffffff;
+  background-color: #34b6a2;
+  color: #ffffff;
 }
 
-.footer-right button+button {
-    margin-left: 8px;
+.footer-right button + button {
+  margin-left: 8px;
 }
 
 .single-button {
-    justify-content: center;
+  justify-content: center;
 }
 
 .footer-end {
-    justify-content: end;
+  justify-content: end;
 }
 
 .single-button .btn-cancel {
-    background-color: #01a38a;
-    color: #ffffff;
+  background-color: #01a38a;
+  color: #ffffff;
 }
 
 .single-button .btn-cancel:hover {
-    background-color: #34b6a2;
+  background-color: #34b6a2;
 }

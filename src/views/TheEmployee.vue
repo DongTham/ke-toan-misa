@@ -1,21 +1,28 @@
 <template>
-  <div class="dialog">
+  <div class="dialog" ref="theEmployee" @keydown.esc.stop="handleCloseEmployeeForm" tabindex="0">
     <div class="dialog-wrapper employee-form">
       <form class="dialog-container">
         <div class="dialog__header">
           <div class="dialog-header__title">
             <span class="header-title">{{ titleHeader }}</span>
             <div class="header-checkbox">
-              <input type="checkbox" v-model="singleEmployee.IsCustomer" />
+              <input
+                type="checkbox"
+                v-model="singleEmployee.IsCustomer"
+                ref="firstEl"
+                @keydown.shift.tab="focusToLastEl"
+                :tabindex="1"
+              />
               <span>Là khách hàng</span>
             </div>
             <div class="header-checkbox">
-              <input type="checkbox" v-model="singleEmployee.IsSuplier" />
+              <input type="checkbox" v-model="singleEmployee.IsSupplier" :tabindex="2" />
               <span>Là nhà cung cấp</span>
             </div>
           </div>
           <the-button
-            Tooltip="Đóng"
+            :tabindex="-1"
+            Tooltip="Đóng (ESC)"
             :DisableTooltip="false"
             @click="handleCloseEmployeeForm"
             type="button"
@@ -27,16 +34,17 @@
           <div class="dialog-content__field">
             <div class="field-left">
               <text-field
-                ref="inputFieldRef"
+                ref="firstInputField"
+                :tabIndex="3"
                 :Label="titleEmployeeDetails.EmployeeCode"
                 :IsValidate="true"
                 style="width: 65%"
                 v-model="singleEmployee.EmployeeCode"
-                focusInput="input"
                 :TooltipMessage="employeeDetailError.EmployeeCode.Title"
                 :IsShowTooltipMsg="employeeDetailError.EmployeeCode.IsShow"
               ></text-field>
               <text-field
+                :tabIndex="4"
                 :Label="titleEmployeeDetails.EmployeeName"
                 :IsValidate="true"
                 v-model="singleEmployee.EmployeeName"
@@ -46,6 +54,7 @@
             </div>
             <div class="field-right">
               <text-field
+                :tabIndex="7"
                 class="input-date"
                 :Label="titleEmployeeDetails.DateOfBirth"
                 Type="date"
@@ -58,11 +67,12 @@
                 <label>{{ titleEmployeeDetails.Gender }}</label>
                 <div class="content-checkbox__wrapper">
                   <div
-                    style="display: flex; justify-content: center"
+                    style="display: flex; justify-content: center; padding-left: 4px"
                     v-for="(item, index) in genderList"
                     :key="index"
                   >
                     <input
+                      :tabindex="8"
                       type="radio"
                       name="gender"
                       :value="item.Value"
@@ -78,27 +88,33 @@
           <div class="dialog-content__field">
             <div class="field-left" v-click-outside="handleHiddenDepartmentList">
               <text-field
+                ref="departmentField"
+                @keydown.down="keydownSelectItem"
+                @keyup.up="keyupSelectItem"
+                @keydown.tab="handleHiddenDepartmentList"
+                @keypress.enter="handleSelectDepartment(indexOfSelDepartment)"
+                :tabIndex="5"
                 :Label="titleEmployeeDetails.Department"
                 :IsValidate="true"
+                @update:modelValue="handleShowDepartmentList"
                 Class="input-main combobox__input select__record-input"
                 v-model="singleEmployee.DepartmentName"
                 :TooltipMessage="employeeDetailError.DepartmentName.Title"
                 :IsShowTooltipMsg="employeeDetailError.DepartmentName.IsShow"
               ></text-field>
               <button
+                :tabindex="-1"
                 type="button"
                 class="btn-selectdown combobox__button"
                 @click="handleShowDepartmentList"
               ></button>
-              <div class="combobox__data" v-if="isShowSelectDepartment">
+              <div class="combobox__data" v-show="isShowSelectDepartment" ref="comboData">
                 <div
                   class="data-item"
                   v-for="(item, index) in departmentsList"
                   :key="index"
-                  @click="handleSelectDepartment(item)"
-                  v-bind:class="
-                    item.DepartmentName == singleEmployee.DepartmentName ? 'active-item' : ''
-                  "
+                  @click="handleSelectDepartment(index)"
+                  v-bind:class="{ 'active-item': index == indexOfSelDepartment }"
                 >
                   {{ item.DepartmentName }}
                 </div>
@@ -106,11 +122,13 @@
             </div>
             <div class="field-right">
               <text-field
+                :tabIndex="11"
                 :Label="titleEmployeeDetails.IdentityNumber.Name"
                 v-model="singleEmployee.IdentityNumber"
                 :TooltipLabel="titleEmployeeDetails.IdentityNumber.Tooltip"
               ></text-field>
               <text-field
+                :tabIndex="12"
                 class="input-date"
                 :Label="titleEmployeeDetails.IdentityIssueDate"
                 Type="date"
@@ -125,12 +143,14 @@
           <div class="dialog-content__field">
             <div class="field-left">
               <text-field
+                :tabIndex="6"
                 :Label="titleEmployeeDetails.JobPositionName"
                 v-model="singleEmployee.JobPositionName"
               ></text-field>
             </div>
             <div class="field-right">
               <text-field
+                :tabIndex="13"
                 :Label="titleEmployeeDetails.IdentityIssuePlace"
                 v-model="singleEmployee.IdentityIssuePlace"
               ></text-field>
@@ -139,6 +159,7 @@
 
           <div class="dialog-content__field">
             <text-field
+              :tabIndex="14"
               :Label="titleEmployeeDetails.EmployeeAddress"
               v-model="singleEmployee.EmployeeAddress"
             ></text-field>
@@ -146,16 +167,19 @@
 
           <div class="dialog-content__field" style="width: 75%">
             <text-field
+              :tabIndex="15"
               :Label="titleEmployeeDetails.MobilePhone.Name"
               v-model="singleEmployee.MobilePhone"
               :TooltipLabel="titleEmployeeDetails.MobilePhone.Tooltip"
             ></text-field>
             <text-field
+              :tabIndex="16"
               :Label="titleEmployeeDetails.TelePhone.Name"
               v-model="singleEmployee.TelePhone"
               :TooltipLabel="titleEmployeeDetails.TelePhone.Tooltip"
             ></text-field>
             <text-field
+              :tabIndex="17"
               :Label="titleEmployeeDetails.Email"
               v-model="singleEmployee.Email"
               :TooltipMessage="employeeDetailError.Email.Title"
@@ -164,40 +188,50 @@
           </div>
           <div class="dialog-content__field" style="width: 75%">
             <text-field
+              :tabIndex="18"
               :Label="titleEmployeeDetails.BankAccountNumber"
               v-model="singleEmployee.BankAccountNumber"
             ></text-field>
             <text-field
+              :tabIndex="19"
               :Label="titleEmployeeDetails.BankName"
               v-model="singleEmployee.BankName"
             ></text-field>
             <text-field
+              :tabIndex="20"
               :Label="titleEmployeeDetails.BankBranchName"
               v-model="singleEmployee.BankBranchName"
             ></text-field>
           </div>
         </div>
         <div class="dialog__footer">
+          <div class="footer-right">
+            <the-button
+              :tabindex="21"
+              class="btn btn-add"
+              titleExtra="Cất"
+              type="button"
+              @click="handleConfirmPostData"
+              title="Cất (Ctrl+S)"
+            ></the-button>
+            <the-button
+              :tabIndex="22"
+              class="btn btn-add-renew"
+              titleExtra="Cất và Thêm"
+              type="button"
+              @click="handleConfirmPostDataAndRenewForm"
+              title="Cất và Thêm (Ctrl+Shift+S)"
+            ></the-button>
+          </div>
           <the-button
+            :tabIndex="23"
+            @keydown.tab="focusToFirstEl"
+            ref="lastEl"
             class="btn btn-cancel"
             titleExtra="Hủy"
             type="button"
             @click="handleCloseEmployeeForm"
           ></the-button>
-          <div class="footer-right">
-            <the-button
-              class="btn btn-add"
-              titleExtra="Cất"
-              type="button"
-              @click="handleConfirmPostData"
-            ></the-button>
-            <the-button
-              class="btn btn-add-renew"
-              titleExtra="Cất và Thêm"
-              type="button"
-              @click="handleConfirmPostDataAndRenewForm"
-            ></the-button>
-          </div>
         </div>
       </form>
     </div>
@@ -209,12 +243,12 @@ import TheButton from '@/components/base/TheButton.vue';
 import TextField from '@/components/base/input_field/TextField.vue';
 
 import { useStore } from 'vuex';
-import { computed, onMounted, ref, watch, defineExpose } from 'vue';
+import { computed, onMounted, ref, watch, getCurrentInstance } from 'vue';
 import { titleEmployeeDetails, handleActionEmployeeForm } from '@/i18n/i18nEmployeeDetail';
-import { customizeDateTime } from '@/js/funtions/convertDateTime';
-// import { employeeDialogDetail } from '@/i18n/i18nEmployeeDialogDetail';
+import { customizeDateTime } from '@/js/functions/convertDateTime';
 import { employeeDetailErrors } from '@/i18n/i18nEmployeeDetailError';
 import { genderList } from '@/i18n/i18nGender';
+import { toastMessage, showToast } from '@/i18n/i18nCommon';
 import {
   validateCode,
   validateName,
@@ -222,22 +256,69 @@ import {
   validateDateOfBirth,
   validateIdentityIssueDate,
   validateEmail,
-} from '@/js/funtions/validateEmployeeDetail';
-import { employeeRequest } from '@/js/utils/httpRequests';
+} from '@/js/functions/validateEmployeeDetail';
+import employeeRequests from '@/js/utils/employeeRequests';
 
 const isShowSelectDepartment = ref(false);
+const indexOfSelDepartment = ref(null);
 const employeeDetailError = ref(employeeDetailErrors());
-const inputFieldRef = ref();
+const theEmployee = ref(null);
+const firstInputField = ref(null);
+const firstEl = ref(null);
+const lastEl = ref(null);
+const instance = getCurrentInstance();
 
 const dateMax = computed(() => customizeDateTime(Date.now(), 'YYYY-MM-DD'));
 const store = useStore();
 
 const singleEmployee = computed(() => store.getters.singleEmployee);
-const departmentsList = computed(() => store.getters.departmentsList);
+const departmentsList = computed(() =>
+  store.getters.departmentsList.filter((el) =>
+    el.DepartmentName.toLowerCase().includes(singleEmployee.value.DepartmentName.toLowerCase()),
+  ),
+);
 const titleHeader = computed(() => store.getters.getTitleHeader);
 const actionEmployeeForm = computed(() => store.getters.getHandleAction);
 const isModified = computed(() => store.getters.getIsModified);
 const presentFocusInput = computed(() => store.getters.getPresentFocusInput);
+
+const comboData = ref(null);
+const departmentField = ref(null);
+
+const keydownSelectItem = () => {
+  if (isShowSelectDepartment.value == true) {
+    if (
+      indexOfSelDepartment.value == null ||
+      indexOfSelDepartment.value >= departmentsList.value.length - 1
+    ) {
+      indexOfSelDepartment.value = 0;
+    } else if (departmentsList.value.length > 0) {
+      indexOfSelDepartment.value =
+        indexOfSelDepartment.value >= departmentsList.value.length - 1
+          ? indexOfSelDepartment.value
+          : indexOfSelDepartment.value + 1;
+    }
+  } else {
+    singleEmployee.value.DepartmentName = '';
+    isShowSelectDepartment.value = true;
+  }
+};
+
+const keyupSelectItem = () => {
+  if (
+    isShowSelectDepartment.value == true &&
+    indexOfSelDepartment.value != null &&
+    indexOfSelDepartment.value != 0 &&
+    departmentsList.value.length > 0
+  ) {
+    indexOfSelDepartment.value--;
+  }
+};
+
+const focusCodeField = () => {
+  // Focus vào ô mã nhân viên
+  firstInputField.value.$refs.focusInput.focus();
+};
 
 onMounted(() => {
   // Validate form chi tiết nhân viên
@@ -258,12 +339,40 @@ onMounted(() => {
     { deep: true },
   );
 
-  // Focus vào ô mã nhân viên
-  inputFieldRef.value.focusEmployeeCode();
+  focusCodeField();
 
   // Lấy danh sách tất cả đơn vị
   store.dispatch('getAllDepartments');
+
+  instance.keepContext = false;
+
+  theEmployee.value.addEventListener('keydown', (event) => {
+    if (event.key == 'Control' || event.key == 'Shift') {
+      instance.keepContext = false;
+    } else {
+      doSave(event);
+    }
+  });
 });
+
+const doSave = (e) => {
+  if (e.key.toUpperCase() == 'S' && e.ctrlKey) {
+    e.preventDefault();
+    if (e.shiftKey) {
+      handleConfirmPostDataAndRenewForm();
+    } else {
+      handleConfirmPostData();
+    }
+  }
+};
+
+const focusToFirstEl = () => {
+  firstEl.value.focus();
+};
+
+const focusToLastEl = () => {
+  lastEl.value.$el.focus();
+};
 
 /**
  * Kiểm tra trùng mã nhân viên
@@ -271,12 +380,10 @@ onMounted(() => {
  * Author: NQDONG (10/11/2022)
  */
 const checkDuplicateEmployeeCode = async () => {
-  let urlCheckDuplicate = `checkDuplicateCode?recordCode=${singleEmployee.value.EmployeeCode}`;
-  if (actionEmployeeForm.value == handleActionEmployeeForm.Edit.Action) {
-    urlCheckDuplicate += `&recordID=${singleEmployee.value.EmployeeID}`;
-  }
-
-  const res = await employeeRequest.get(urlCheckDuplicate);
+  const res = await employeeRequests.checkDuplicateCode(
+    singleEmployee.value.EmployeeCode,
+    singleEmployee.value.EmployeeID,
+  );
   return res.data.IsDuplicateCode;
 };
 
@@ -286,7 +393,7 @@ const checkDuplicateEmployeeCode = async () => {
  */
 const actionAddEmployee = async () => {
   store.commit('updateFilterAndPaging', [{ pageNumber: 1 }, { keyword: '' }]);
-  await employeeRequest.post('', singleEmployee.value).then((data) => {
+  await employeeRequests.insert(singleEmployee.value).then((data) => {
     store.commit('updateSelectedEmployeeId', data.data.EmployeeID);
   });
 };
@@ -296,8 +403,8 @@ const actionAddEmployee = async () => {
  * Author: NQDONG (10/11/2022)
  */
 const actionEditEmployee = async () => {
-  await employeeRequest
-    .put(`${singleEmployee.value.EmployeeID}`, singleEmployee.value)
+  await employeeRequests
+    .update(singleEmployee.value)
     .finally(
       store.commit('updateTitleHeader', handleActionEmployeeForm.AddNew.Title),
       store.commit('updateHandleAction', handleActionEmployeeForm.AddNew.Action),
@@ -312,11 +419,13 @@ const getBiggestCode = async () => {
   // Lấy mã lớn nhất từ store
   let maxRecord = await store.dispatch('getMaxRecord');
 
-  // Focus vào ô mã nhân viên
-  inputFieldRef.value.focusEmployeeCode();
+  focusCodeField();
 
   // Cập nhật lại giá trị của nhân viên đang chọn
-  await store.commit('updateSingleEmployee', { EmployeeCode: 'NV' + maxRecord });
+  await store.commit('updateSingleEmployee', {
+    EmployeeCode: 'NV' + maxRecord,
+    DepartmentName: '',
+  });
 
   store.commit('updateIsModified', false);
 };
@@ -348,9 +457,15 @@ const handleConfirmPostDataAndRenewForm = async () => {
         // Kiểm tra thao tác của form là tạo mới
         if (actionEmployeeForm.value == handleActionEmployeeForm.AddNew.Action) {
           await actionAddEmployee();
+
+          // Hiện alert thông báo thành công
+          showToast(toastMessage.AddNewSuccess.Msg, toastMessage.AddNewSuccess.Type);
         } // Kiểm tra thao tác của form là sửa
         else if (actionEmployeeForm.value == handleActionEmployeeForm.Edit.Action) {
           await actionEditEmployee();
+
+          // Hiện alert thông báo thành công
+          showToast(toastMessage.EditSuccess.Msg, toastMessage.EditSuccess.Type);
         }
 
         await getBiggestCode();
@@ -411,8 +526,10 @@ const handleCloseEmployeeForm = async () => {
   }
 };
 
+// eslint-disable-next-line no-undef
 defineExpose({
   handleConfirmPostData,
+  focusCodeField,
 });
 
 /**
@@ -420,17 +537,25 @@ defineExpose({
  * Author: NQDONG (10/11/2022)
  */
 const handleShowDepartmentList = () => {
-  isShowSelectDepartment.value = !isShowSelectDepartment.value;
+  isShowSelectDepartment.value = true;
+  singleEmployee.value.DepartmentName = '';
+  departmentField.value.$refs.focusInput.focus();
 };
 
 /**
  * Thao tác chọn đơn vị
- * @param {String} el Thông tin 1 đơn vị đã chọn
+ * @param {Object} el Thông tin 1 đơn vị đã chọn
  * Author: NQDONG (10/11/2022)
  */
 const handleSelectDepartment = (el) => {
-  singleEmployee.value.DepartmentName = el.DepartmentName;
-  singleEmployee.value.DepartmentID = el.DepartmentID;
+  // indexOfSelDepartment.value = departmentsList.value.indexOf(
+  //   (el) => el.DepartmentID == el.DepartmentID,
+  // );
+  indexOfSelDepartment.value = el;
+  let singleDepartment = departmentsList.value.at(el);
+  singleEmployee.value.DepartmentID = singleDepartment.DepartmentID;
+  singleEmployee.value.DepartmentName = singleDepartment.DepartmentName;
+
   isShowSelectDepartment.value = false;
   employeeDetailError.value.DepartmentName.IsShow = false;
 };
@@ -440,6 +565,19 @@ const handleSelectDepartment = (el) => {
  * Author: NQDONG (10/11/2022)
  */
 const handleHiddenDepartmentList = () => {
+  if (employeeDetailError.value.DepartmentName.IsShow) {
+    singleEmployee.value.DepartmentName = '';
+  } else if (
+    indexOfSelDepartment.value != null &&
+    departmentsList.value.length > 0 &&
+    isShowSelectDepartment.value
+  ) {
+    singleEmployee.value.DepartmentID =
+      departmentsList.value[indexOfSelDepartment.value].DepartmentID;
+    singleEmployee.value.DepartmentName =
+      departmentsList.value[indexOfSelDepartment.value].DepartmentName;
+    employeeDetailError.value.DepartmentName.IsShow = false;
+  }
   isShowSelectDepartment.value = false;
 };
 

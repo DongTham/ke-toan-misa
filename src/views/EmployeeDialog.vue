@@ -1,5 +1,10 @@
 <template>
-  <div class="dialog dialog-confirm">
+  <div
+    class="dialog dialog-confirm"
+    ref="employeeDialog"
+    @keydown.esc.stop="handleCloseEmployeeDialog"
+    tabindex="0"
+  >
     <div class="dialog-wrapper">
       <form class="employee-dialog">
         <div class="employee-dialog__header">
@@ -7,8 +12,9 @@
             <span class="header-title">{{ contentEmployeeDialog.TitleHeader }}</span>
           </div>
           <the-button
+            :tabindex="-1"
             @click="handleCloseEmployeeDialog"
-            Tooltip="Đóng"
+            Tooltip="Đóng (ESC)"
             :DisableTooltip="false"
             type="button"
             class="dialog-header__button"
@@ -25,6 +31,7 @@
         </div>
         <div class="employee-dialog__footer" :class="contentEmployeeDialog.Style">
           <the-button
+            ref="buttonCancel"
             class="btn btn-cancel"
             type="button"
             v-if="contentEmployeeDialog.CancelButton != null"
@@ -54,17 +61,44 @@
 </template>
 
 <script setup>
-import { computed, defineEmits, defineProps } from 'vue';
+import { computed, onMounted, onUnmounted, onUpdated, ref } from 'vue';
 import { useStore } from 'vuex';
-import { employeeRequest } from '@/js/utils/httpRequests';
+import employeeRequests from '@/js/utils/employeeRequests';
 import TheButton from '@/components/base/TheButton.vue';
+import { toastMessage, showToast } from '@/i18n/i18nCommon';
+
+const employeeDialog = ref(null);
+const buttonCancel = ref(null);
+
+onUnmounted(() => {
+  if (
+    contentEmployeeDialog.value.Type != 'delete' &&
+    contentEmployeeDialog.value.Type != 'delete-multiple'
+  ) {
+    emitsDialog('focusCodeField');
+  }
+});
+
+onMounted(() => {
+  buttonCancel.value.$el.focus();
+});
+onUpdated(() => {
+  buttonCancel.value.$el.focus();
+});
 
 const store = useStore();
 
 // Khởi tạo Emits
-const emitsDialog = defineEmits(['refreshEvent', 'refreshSelectedEmployees', 'handleConfirm']);
+// eslint-disable-next-line no-undef
+const emitsDialog = defineEmits([
+  'refreshEvent',
+  'refreshSelectedEmployees',
+  'handleConfirm',
+  'focusCodeField',
+]);
 
 // Khởi tạo Props
+// eslint-disable-next-line no-undef
 const propsDialog = defineProps({ selectedEmployees: Array });
 const contentEmployeeDialog = computed(() => store.getters.getContentEmployeeDialog);
 
@@ -72,7 +106,7 @@ const contentEmployeeDialog = computed(() => store.getters.getContentEmployeeDia
  * Hành động khi bấm tắt modal
  * Author: NQDONG (10/11/2022)
  */
-const handleCloseEmployeeDialog = () => {
+const handleCloseEmployeeDialog = async () => {
   store.commit('updateIsShowEmployeeDialog', false);
   store.commit('updateContentEmployeeDialog', {});
 };
@@ -95,6 +129,7 @@ const actionConfirmed = async () => {
 
     // Đã bị chỉnh sửa
     case 'modified-employee':
+      handleCloseEmployeeDialog();
       emitsDialog('handleConfirm');
       break;
     default:
@@ -137,10 +172,14 @@ const handleDeleteEmployee = async () => {
     const employeeId = store.getters.getSelectedEmployeeId;
 
     // Thực hiện xóa 1 nhân viên qua API
-    await employeeRequest.delete(`${employeeId}`);
+    await employeeRequests.delete(employeeId);
 
     store.commit('updateSelectedEmployeeId', '');
     emitsDialog('refreshEvent');
+
+    // Hiện alert thông báo thành công
+    showToast(toastMessage.DeleteSuccess.Msg, toastMessage.DeleteSuccess.Type);
+
     handleCloseEmployeeDialog();
   } catch (error) {
     // Mở modal thông báo lỗi
@@ -160,10 +199,14 @@ const handleDeleteMultipleEmployee = async () => {
     store.commit('updateShowProgress', true);
 
     // Thực hiện xóa hàng loạt qua API
-    await employeeRequest.post('deleteBatch', { EmployeeIDs: propsDialog.selectedEmployees });
+    await employeeRequests.deleteMultiple(propsDialog.selectedEmployees);
 
     emitsDialog('refreshEvent');
     emitsDialog('refreshSelectedEmployees');
+
+    // Hiện alert thông báo thành công
+    showToast(toastMessage.DeleteBatchSuccess.Msg, toastMessage.DeleteBatchSuccess.Type);
+
     handleCloseEmployeeDialog();
   } catch (error) {
     // Mở modal thông báo lỗi

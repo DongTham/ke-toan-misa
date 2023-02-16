@@ -62,14 +62,10 @@
             <v-tooltip text="Tải lại dữ liệu" activator="parent" location="bottom"></v-tooltip>
           </button>
 
-          <a v-bind:href="exportToExcel"
-            ><button class="btn-icon main__icon btn-export">
-              <v-tooltip
-                text="Xuất khẩu file Excel"
-                activator="parent"
-                location="bottom"
-              ></v-tooltip></button
-          ></a>
+          <button class="btn-icon main__icon btn-export" @click="exportEmployeesToExcel">
+            <v-tooltip text="Xuất khẩu file Excel" activator="parent" location="bottom"></v-tooltip>
+          </button>
+
           <!-- <button class="btn-icon main__icon btn-filter"></button> -->
         </div>
       </div>
@@ -110,7 +106,6 @@
             <tr
               v-for="(item, index) in employeesList"
               :key="index"
-              v-bind:tabindex="index"
               @dblclick.stop="openFormEditEmployee(item.EmployeeID)"
             >
               <td class="ms-hidden"></td>
@@ -244,6 +239,7 @@
     @refresh-selected-employees="refreshSelectedEmployees"
     :selectedEmployees="selectedEmployeeList"
     @handle-confirm="handleConfirmAciton"
+    @focus-code-field="$refs.employeeDetail?.focusCodeField()"
   ></employee-dialog>
   <the-employee v-if="showEmployeeForm" ref="employeeDetail"></the-employee>
 </template>
@@ -256,10 +252,11 @@ import EmployeeDialog from '@/views/EmployeeDialog.vue';
 import TheEmployee from '@/views/TheEmployee.vue';
 
 import { selectPageSize, headerTableName } from '@/i18n/i18nEmployeeTable';
-import { customizeDateTime } from '@/js/funtions/convertDateTime';
-import { convertGenderVietNamese } from '@/js/funtions/convertGender';
+import { customizeDateTime } from '@/js/functions/convertDateTime';
+import { convertGenderVietNamese } from '@/js/functions/convertGender';
 import { handleActionEmployeeForm } from '@/i18n/i18nEmployeeDetail';
-import { employeeRequest } from '@/js/utils/httpRequests';
+import FileSaver from 'file-saver';
+import employeeRequests from '@/js/utils/employeeRequests';
 
 const showSelectPageSize = ref(false);
 const showSelectContextMenu = ref(null);
@@ -268,7 +265,6 @@ const showEmployeeForm = computed(() => store.getters.showEmployeeForm);
 const totalAllEmployees = ref(0);
 const employeeDetail = ref();
 const selectedEmployeeList = reactive([]);
-const exportToExcel = ref('https://localhost:7228/api/v1/Employees/exportAllRecord');
 
 const store = useStore();
 
@@ -403,7 +399,7 @@ const checkAllItemsInPage = async () => {
     });
 
     // Lấy tất cả bản ghi nhân viên
-    let response = await employeeRequest.get();
+    let response = await employeeRequests.getAll();
     totalAllEmployees.value = response.data.length;
     isCheckedAll.value = true;
   }
@@ -419,7 +415,7 @@ const checkItemInAllPages = async () => {
     selectedEmployeeList.length = 0;
 
     // Lấy tất cả bản ghi nhân viên
-    let response = await employeeRequest.get();
+    let response = await employeeRequests.getAll();
     totalAllEmployees.value = response.data.length;
     response.data.forEach((value) => {
       selectedEmployeeList.push(value.EmployeeID);
@@ -539,6 +535,7 @@ const renewEmployeeCode = async () => {
 
   let selectedEmployee = store.getters.singleEmployee;
   selectedEmployee.EmployeeCode = 'NV' + maxRecord;
+  selectedEmployee.DepartmentName = '';
 
   // Đưa nhân viên đang chọn lên đầu danh sách nhân viên
   employeesList.value.unshift(selectedEmployee);
@@ -606,6 +603,34 @@ const handleDeleteEmployee = (employeeId, employeeCode) => {
 const handleDeleteMultipleEmployees = () => {
   // Mở dialog xác nhận qua store
   store.dispatch('openEmployeeDialog', { Type: 'ConfirmDeleteMultiple' });
+};
+
+/**
+ * Hàm xuất file excel danh sách nguyên vật liệu
+ * Author: NQDONG (15/12/2022)
+ */
+const exportEmployeesToExcel = async () => {
+  try {
+    store.commit('updateShowProgress', true);
+
+    const response = await employeeRequests.exportToExcel(
+      filterAndPaging.value,
+      store.getters.selectedEmployeeId,
+    );
+    let fileName =
+      'Danh_sach_nhan_vien ' + customizeDateTime(Date.now(), 'DD-MM-YYYY HH-MM-SS') + '.xlsx';
+    FileSaver.saveAs(response.data, fileName);
+  } catch (error) {
+    // Mở modal thông báo lỗi
+    if (error.response.status != 404) {
+      store.dispatch('openMaterialDialog', {
+        Msg: { Msg: [error.response.data?.UserMsg] },
+        Type: 'ErrorPostData',
+      });
+    }
+  } finally {
+    store.commit('updateShowProgress', false);
+  }
 };
 </script>
 

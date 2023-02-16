@@ -1,3 +1,8 @@
+import { useToast } from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+
+const $toast = useToast();
+
 const sidebarMenu = [{
         Title: 'Tổng quan',
         ClassButton: 'btn-icon menu__button-icon overview-icon',
@@ -76,4 +81,31 @@ const sidebarMenu = [{
     },
 ];
 
-export { sidebarMenu };
+const showToast = (msg = 'Thao tác thành công!', type = 'success') => {
+    $toast.open({
+        message: msg,
+        type: type,
+        position: 'top-right',
+    });
+};
+
+const toastMessage = {
+    DeleteSuccess: {
+        Msg: 'Xóa nhân viên thành công!',
+        Type: 'success',
+    },
+    DeleteBatchSuccess: {
+        Msg: 'Xóa nhiều nhân viên thành công!',
+        Type: 'success',
+    },
+    AddNewSuccess: {
+        Msg: 'Thêm nhân viên thành công!',
+        Type: 'success',
+    },
+    EditSuccess: {
+        Msg: 'Sửa nhân viên thành công!',
+        Type: 'success',
+    },
+};
+
+export { sidebarMenu, toastMessage, showToast };

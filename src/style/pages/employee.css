@@ -1,230 +1,243 @@
 /* CSS Dialog */
 
 .dialog {
-    display: flex;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(85, 79, 79, 0.2);
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
+  display: flex;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(85, 79, 79, 0.2);
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
 }
 
 .dialog-wrapper {
-    position: absolute;
+  position: absolute;
 }
 
 .dialog-container {
-    border: unset;
-    border-radius: 4px;
-    background-color: #ffffff;
-    padding: 32px;
-    font: 400 14px Roboto-Regular;
-    color: #1f1f1f;
-    line-height: 18px;
+  border: unset;
+  border-radius: 4px;
+  background-color: #ffffff;
+  padding: 32px;
+  font: 400 14px Roboto-Regular;
+  color: #1f1f1f;
+  line-height: 18px;
 }
 
 .employee-form {
-    min-width: 50%;
+  min-width: 50%;
 }
-
 
 /* CSS Dialog Header */
 
 .dialog__header {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .dialog-header__title {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .header-title {
-    font: 700 24px Roboto-Bold;
+  font: 700 24px Roboto-Bold;
 }
 
 .header-checkbox {
-    display: flex;
-    padding: 0 16px;
-    align-items: center;
+  display: flex;
+  padding: 0 16px;
+  align-items: center;
 }
 
 .header-checkbox input {
-    height: 20px;
-    width: 20px;
-    margin: 0;
-    outline: none;
+  height: 20px;
+  width: 20px;
+  margin: 0;
+  outline: none;
 }
 
 .header-checkbox span {
-    padding-left: 8px;
+  padding-left: 8px;
 }
 
 .dialog-header__button {
-    position: relative;
-    background-color: transparent;
-    border: unset;
-    outline: none;
-    padding: 0;
+  position: relative;
+  background-color: transparent;
+  border: unset;
+  outline: none;
+  padding: 0;
 }
 
 .btn-close {
-    background-position: -1172px -356px;
-    height: 24px;
-    width: 24px;
+  background-position: -1172px -356px;
+  height: 24px;
+  width: 24px;
 }
-
 
 /* CSS Dialog Content */
 
 .dialog__content {
-    position: relative;
-    padding: 32px 0;
+  position: relative;
+  padding: 32px 0;
 }
 
 .dialog-content__field {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .dialog-content__field .combobox__data {
-    bottom: unset;
-    top: calc(100% - 20px);
-    z-index: 10;
+  bottom: unset;
+  top: calc(100% - 20px);
+  z-index: 10;
 }
 
 .field-left {
-    display: flex;
-    width: 50%;
-    position: relative;
+  display: flex;
+  width: 50%;
+  position: relative;
 }
 
 .field-right {
-    display: flex;
-    width: 50%;
-    position: relative;
+  display: flex;
+  width: 50%;
+  position: relative;
 }
 
-.field-left+.field-right {
-    margin-left: 24px;
+.field-left + .field-right {
+  margin-left: 24px;
 }
 
 .field-left .btn-selectdown {
-    bottom: 24px;
+  bottom: 24px;
 }
 
 .input-date {
-    width: 80%;
+  width: 80%;
 }
 
 .content-checkbox {
-    display: grid;
-    margin: 0 0 24px 8px;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
+  display: grid;
+  margin: 0 0 24px 8px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
 }
 
 .content-checkbox__wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    position: relative;
-    overflow: hidden;
-    margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
 }
 
 .content-checkbox__wrapper input {
-    height: 20px;
-    min-height: 20px;
-    width: 20px;
-    min-width: 20px;
-    outline: none;
-    margin: 0;
+  height: 20px;
+  min-height: 20px;
+  width: 20px;
+  min-width: 20px;
+  outline: none;
+  margin: 0;
 }
 
-.content-checkbox__wrapper span+input {
-    margin-left: 4px;
+.content-checkbox__wrapper span + input {
+  margin-left: 4px;
 }
 
 input[type='radio'],
 input[type='checkbox'] {
-    /* remove standard background appearance */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    /* create custom radiobutton appearance */
-    display: inline-block;
-    padding: 3px;
-    /* background-color only for content */
-    background-clip: content-box;
-    border: 1px solid #bbbbbb;
-    border-radius: 50%;
+  /* remove standard background appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* create custom radiobutton appearance */
+  display: inline-block;
+  padding: 3px;
+  /* background-color only for content */
+  background-clip: content-box;
+  border: 1px solid #bbbbbb;
+  border-radius: 50%;
 }
 
 input[type='checkbox'] {
-    border-radius: 4px;
+  border-radius: 4px;
 }
 
-.field-left:has(.select__record-input:focus)>.combobox__button {
-    border: 1px solid #50b83c;
-    border-left: unset;
+.field-left:has(.select__record-input:focus) > .combobox__button {
+  border: 1px solid #50b83c;
+  border-left: unset;
 }
-
 
 /* appearance for checked radiobutton */
 
 input[type='radio']:checked,
 input[type='checkbox']:checked {
-    background-color: #089740;
-    border: 3px solid #089740;
+  background-color: #089740;
+  border: 2px solid #089740;
+}
+
+input[type='radio']:focus,
+input[type='checkbox']:focus {
+  outline: 1px solid #50b83c;
+  border-color: #50b83c;
 }
 
 .content-checkbox__wrapper span {
-    padding: 0 8px;
+  padding: 0 8px;
 }
 
-.content-checkbox>label {
-    font-weight: 700;
+.content-checkbox > label {
+  font-weight: 700;
 }
-
 
 /* CSS Dialog Footer */
 
 .dialog__footer {
-    border-top: 1px solid #e0e0e0;
-    padding-top: 32px;
-    display: flex;
-    justify-content: space-between;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 32px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+}
+
+.dialog__footer button:focus {
+  outline: 1px solid #1f1f1f;
 }
 
 .dialog__footer .btn-cancel,
 .dialog__footer .btn-add {
-    background-color: #ffffff;
-    border-radius: 3px;
-    border: 1px solid #e0e0e0;
+  background-color: #ffffff;
+  border-radius: 3px;
+  border: 1px solid #e0e0e0;
 }
 
 .dialog__footer .btn-cancel:hover,
 .dialog__footer .btn-add:hover {
-    background-color: #f1f1f1;
+  background-color: #f1f1f1;
+}
+
+.dialog__footer .btn-cancel:focus,
+.dialog__footer .btn-add:focus {
+  background-color: #f1f1f1;
+  border: 2px solid #e0e0e0;
 }
 
 .dialog__footer .btn-add-renew {
-    background-color: #01a38a;
-    color: #ffffff;
+  background-color: #01a38a;
+  color: #ffffff;
 }
 
-.dialog__footer .btn-add-renew:hover {
-    background-color: #34b6a2;
-    color: #ffffff;
+.dialog__footer .btn-add-renew:hover,
+.dialog__footer .btn-add-renew:focus {
+  background-color: #34b6a2;
 }
 
-.footer-right button+button {
-    margin-left: 12px;
+.footer-right button + button {
+  margin-left: 12px;
 }

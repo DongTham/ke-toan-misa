@@ -1,5 +1,6 @@
-import axios from 'axios';
-import { customizeDateTime } from '@/js/funtions/convertDateTime';
+import employeeRequests from '@/js/utils/employeeRequests';
+import departmentRequests from '@/js/utils/departmentRequests';
+import { customizeDateTime } from '@/js/functions/convertDateTime';
 
 const employeeStore = {
     state: () => ({
@@ -27,7 +28,7 @@ const employeeStore = {
          */
         async getAllDepartments({ commit }) {
             try {
-                const response = await axios.get('https://localhost:7228/api/v1/Departments');
+                const response = await departmentRequests.getAll();
                 commit('updateDepartmentsList', response.data);
             } catch (error) {
                 console.log(error);
@@ -41,7 +42,7 @@ const employeeStore = {
          */
         async getSingleEmployee({ commit }, employeeId) {
             try {
-                const response = await axios.get(`https://localhost:7228/api/v1/Employees/${employeeId}`);
+                const response = await employeeRequests.getByID(employeeId);
                 response.data.DateOfBirth = customizeDateTime(response.data.DateOfBirth, 'YYYY-MM-DD');
                 response.data.IdentityIssueDate = customizeDateTime(
                     response.data.IdentityIssueDate,
@@ -59,7 +60,7 @@ const employeeStore = {
          */
         async getMaxRecord() {
             try {
-                const response = await axios.get('https://localhost:7228/api/v1/Employees/maxRecord');
+                const response = await employeeRequests.getBiggestCode();
                 let maxRecord = response.data.EmployeeCode;
                 return (maxRecord + 1).toString().padStart(5, 0);
             } catch (error) {
