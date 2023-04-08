@@ -7,8 +7,8 @@ import moment from 'moment';
  * @returns Ngày tháng đã convert
  * Author: NQDONG (10/11/2022)
  */
-const customizeDateTime = function(date, formatString = 'DD/MM/YYYY') {
-    return date ? moment(date).format(formatString) : date;
+const customizeDateTime = function (date, formatString = 'MM/DD/YYYY') {
+  return date ? moment(date).format(formatString) : date;
 };
 
 export { customizeDateTime };

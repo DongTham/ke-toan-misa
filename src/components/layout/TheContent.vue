@@ -535,7 +535,7 @@ const renewEmployeeCode = async () => {
 
   let selectedEmployee = store.getters.singleEmployee;
   selectedEmployee.EmployeeCode = 'NV' + maxRecord;
-  selectedEmployee.DepartmentName = '';
+  // selectedEmployee.DepartmentName = '';
 
   // Đưa nhân viên đang chọn lên đầu danh sách nhân viên
   employeesList.value.unshift(selectedEmployee);

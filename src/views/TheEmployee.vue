@@ -58,6 +58,7 @@
                 class="input-date"
                 :Label="titleEmployeeDetails.DateOfBirth"
                 Type="date"
+                placeholder="dd-mm-yyyy"
                 v-model="singleEmployee.DateOfBirth"
                 :dateMax="dateMax"
                 :TooltipMessage="employeeDetailError.DateOfBirth.Title"
@@ -274,7 +275,7 @@ const store = useStore();
 const singleEmployee = computed(() => store.getters.singleEmployee);
 const departmentsList = computed(() =>
   store.getters.departmentsList.filter((el) =>
-    el.DepartmentName.toLowerCase().includes(singleEmployee.value.DepartmentName.toLowerCase()),
+    el.DepartmentName.toLowerCase().includes(singleEmployee.value.DepartmentName?.toLowerCase()),
   ),
 );
 const titleHeader = computed(() => store.getters.getTitleHeader);
@@ -355,6 +356,10 @@ onMounted(() => {
   });
 });
 
+/**
+ * Thao tác với bàn phím
+ * Author: NQDONG (10/11/2022)
+ */
 const doSave = (e) => {
   if (e.key.toUpperCase() == 'S' && e.ctrlKey) {
     e.preventDefault();
@@ -366,10 +371,18 @@ const doSave = (e) => {
   }
 };
 
+/**
+ * Focus vào input đầu tiên trong form
+ * Author: NQDONG (10/11/2022)
+ */
 const focusToFirstEl = () => {
   firstEl.value.focus();
 };
 
+/**
+ * Focus vào button cuối cùng trong form
+ * Author: NQDONG (10/11/2022)
+ */
 const focusToLastEl = () => {
   lastEl.value.$el.focus();
 };

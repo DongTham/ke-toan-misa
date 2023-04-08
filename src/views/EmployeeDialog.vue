@@ -71,6 +71,7 @@ const employeeDialog = ref(null);
 const buttonCancel = ref(null);
 
 onUnmounted(() => {
+  //Focus vào ô Mã nhân viên
   if (
     contentEmployeeDialog.value.Type != 'delete' &&
     contentEmployeeDialog.value.Type != 'delete-multiple'
